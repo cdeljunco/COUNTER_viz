@@ -1,0 +1,99 @@
+Report_Name,Journal Requests (Excluding OA_Gold),,,,,,,,,,,,,,,,,,,,,
+Report_ID,TR_J1,,,,,,,,,,,,,,,,,,,,,
+Release,5,,,,,,,,,,,,,,,,,,,,,
+Institution_Name,Wesleyan University,,,,,,,,,,,,,,,,,,,,,
+Institution_ID,iopscience:3_635,,,,,,,,,,,,,,,,,,,,,
+Metric_Types,Total_Item_Requests; Unique_Item_Requests,,,,,,,,,,,,,,,,,,,,,
+Report_Filters,Data_Type=Journal; Access_Type=Controlled; Access_Method=Regular,,,,,,,,,,,,,,,,,,,,,
+Report_Attributes,,,,,,,,,,,,,,,,,,,,,,
+Exceptions,,,,,,,,,,,,,,,,,,,,,,
+Reporting_Period,Begin_Date=2019-07-01; End_Date=2020-06-30,,,,,,,,,,,,,,,,,,,,,
+Created,2021-07-29T16:58:58Z,,,,,,,,,,,,,,,,,,,,,
+Created_By,MPS for IOPSCIENCE,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,
+Title,Publisher,Publisher_ID,Platform,DOI,Proprietary_ID,Print_ISSN,Online_ISSN,URI,Metric_Type,Reporting_Period_Total,Jul-2019,Aug-2019,Sep-2019,Oct-2019,Nov-2019,Dec-2019,Jan-2020,Feb-2020,Mar-2020,Apr-2020,May-2020,Jun-2020
+The Astrophysical Journal,IOP,,IOPscience,10.1088/issn.0004-637X,iopscience:0004-637X,0004-637X,1538-4357,http://iopscience.iop.org/journal/0004-637X,Unique_Item_Requests,432,46,7,39,45,82,29,23,73,56,20,3,9
+The Astronomical Journal,IOP,,IOPscience,10.1088/issn.1538-3881,iopscience:1538-3881,0104-1956,1538-3881,http://iopscience.iop.org/journal/1538-3881,Unique_Item_Requests,125,8,1,13,5,21,4,8,23,30,6,5,1
+The Astrophysical Journal Letters,IOP,,IOPscience,10.1088/issn.2041-8205,iopscience:2041-8205,2041-8205,2041-8213,http://iopscience.iop.org/journal/2041-8205,Unique_Item_Requests,93,5,0,3,6,21,4,11,10,3,14,16,0
+EPL (Europhysics Letters),IOP,,IOPscience,10.1088/issn.0295-5075,iopscience:0295-5075,0295-5075,1286-4854,http://iopscience.iop.org/journal/0295-5075,Unique_Item_Requests,85,3,7,3,10,4,13,5,9,10,2,14,5
+The Astrophysical Journal Supplement Series,IOP,,IOPscience,10.1088/issn.0067-0049,iopscience:0067-0049,0067-0049,1538-4365,http://iopscience.iop.org/journal/0067-0049,Unique_Item_Requests,83,9,4,4,5,6,16,2,9,8,14,0,6
+Journal of Physics A: Mathematical and Theoretical,IOP,,IOPscience,10.1088/issn.1751-8121,iopscience:1751-8121,1751-8113,1751-8121,http://iopscience.iop.org/journal/1751-8121,Unique_Item_Requests,76,5,0,2,24,12,6,5,2,5,2,4,9
+The Astrophysical Journal Letters,IOP,,IOPscience,10.1088/issn.1538-4357,iopscience:1538-4357,0004-637X,1538-4357,http://iopscience.iop.org/journal/1538-4357,Unique_Item_Requests,68,6,1,3,5,4,12,0,22,9,3,1,2
+Reports on Progress in Physics,IOP,,IOPscience,10.1088/issn.0034-4885,iopscience:0034-4885,0034-4885,1361-6633,http://iopscience.iop.org/journal/0034-4885,Unique_Item_Requests,59,3,2,3,1,20,10,5,4,1,1,6,3
+Publications of the Astronomical Society of the Pacific,IOP,,IOPscience,10.1088/issn.1538-3873,iopscience:1538-3873,0104-1980,1538-3873,http://iopscience.iop.org/journal/1538-3873,Unique_Item_Requests,53,3,0,8,3,1,1,9,23,1,2,0,2
+Journal of Physics A: Mathematical and General,IOP,,IOPscience,10.1088/issn.0305-4470,iopscience:0305-4470,0305-4470,1361-6447,http://iopscience.iop.org/journal/0305-4470,Unique_Item_Requests,52,9,1,4,3,6,6,10,4,3,4,2,0
+Journal of Physics: Condensed Matter,IOP,,IOPscience,10.1088/issn.0953-8984,iopscience:0953-8984,0953-8984,1361-648X,http://iopscience.iop.org/journal/0953-8984,Unique_Item_Requests,50,2,0,4,6,6,6,3,5,3,1,9,5
+European Journal of Physics,IOP,,IOPscience,10.1088/issn.0143-0807,iopscience:0143-0807,0143-0807,1361-6404,http://iopscience.iop.org/journal/0143-0807,Unique_Item_Requests,37,5,4,8,4,1,3,2,5,3,2,0,0
+Journal of Physics B: Atomic Molecular and Optical Physics,IOP,,IOPscience,10.1088/issn.0953-4075,iopscience:0953-4075,0953-4075,1361-6455,http://iopscience.iop.org/journal/0953-4075,Unique_Item_Requests,31,4,2,4,1,0,2,6,4,1,3,3,1
+Journal of Physics D: Applied Physics,IOP,,IOPscience,10.1088/issn.0022-3727,iopscience:0022-3727,0022-3727,1361-6463,http://iopscience.iop.org/journal/0022-3727,Unique_Item_Requests,28,4,0,0,3,5,1,0,1,4,1,3,6
+Journal of Optics,IOP,,IOPscience,10.1088/issn.2040-8986,iopscience:2040-8986,2040-8978,2040-8986,http://iopscience.iop.org/journal/2040-8986,Unique_Item_Requests,24,0,0,0,4,2,9,3,1,1,0,3,1
+Physica Scripta,IOP,,IOPscience,10.1088/issn.1402-4896,iopscience:1402-4896,0031-8949,1402-4896,http://iopscience.iop.org/journal/1402-4896,Unique_Item_Requests,23,2,2,1,0,0,10,1,2,4,0,1,0
+Japanese Journal of Applied Physics,IOP,,IOPscience,10.1088/issn.1347-4065,iopscience:1347-4065,0021-4922,1347-4065,http://iopscience.iop.org/journal/1347-4065,Unique_Item_Requests,14,2,1,0,4,1,1,1,1,2,0,0,1
+Journal of Neural Engineering,IOP,,IOPscience,10.1088/issn.1741-2552,iopscience:1741-2552,1741-2560,1741-2552,http://iopscience.iop.org/journal/1741-2552,Unique_Item_Requests,14,1,1,0,2,0,6,0,1,0,0,1,2
+Journal of Statistical Mechanics: Theory and Experiment,IOP,,IOPscience,10.1088/issn.1742-5468,iopscience:1742-5468,,1742-5468,http://iopscience.iop.org/journal/1742-5468,Unique_Item_Requests,14,0,1,0,2,2,1,1,0,0,3,2,2
+Physical Biology,IOP,,IOPscience,10.1088/issn.1478-3975,iopscience:1478-3975,1478-3967,1478-3975,http://iopscience.iop.org/journal/1478-3975,Unique_Item_Requests,14,0,0,0,0,0,3,1,0,5,4,1,0
+Plasma Sources Science and Technology,IOP,,IOPscience,10.1088/issn.0963-0252,iopscience:0963-0252,0963-0252,1361-6595,http://iopscience.iop.org/journal/0963-0252,Unique_Item_Requests,12,1,0,0,0,1,0,0,2,8,0,0,0
+Measurement Science and Technology,IOP,,IOPscience,10.1088/issn.0957-0233,iopscience:0957-0233,0957-0233,1361-6501,http://iopscience.iop.org/journal/0957-0233,Unique_Item_Requests,11,2,0,4,0,1,0,3,1,0,0,0,0
+Quantum Science and Technology,IOP,,IOPscience,10.1088/issn.2058-9565,iopscience:2058-9565,,2058-9565,http://iopscience.iop.org/journal/2058-9565,Unique_Item_Requests,11,0,0,0,0,0,10,1,0,0,0,0,0
+Nanotechnology,IOP,,IOPscience,10.1088/issn.0957-4484,iopscience:0957-4484,0957-4484,1361-6528,http://iopscience.iop.org/journal/0957-4484,Unique_Item_Requests,10,2,0,0,2,0,1,2,3,0,0,0,0
+Fluid Dynamics Research,IOP,,IOPscience,10.1088/issn.1873-7005,iopscience:1873-7005,0169-5983,1873-7005,http://iopscience.iop.org/journal/1873-7005,Unique_Item_Requests,9,0,0,0,0,0,0,0,0,0,0,0,9
+Classical and Quantum Gravity,IOP,,IOPscience,10.1088/issn.0264-9381,iopscience:0264-9381,0264-9381,1361-6382,http://iopscience.iop.org/journal/0264-9381,Unique_Item_Requests,8,0,0,0,0,5,1,0,2,0,0,0,0
+Physics Education,IOP,,IOPscience,10.1088/issn.0031-9120,iopscience:0031-9120,0031-9120,1361-6552,http://iopscience.iop.org/journal/0031-9120,Unique_Item_Requests,8,0,0,1,1,1,0,0,0,1,0,4,0
+Chinese Physics B,IOP,,IOPscience,10.1088/issn.1674-1056,iopscience:1674-1056,1674-1056,2058-3834,http://iopscience.iop.org/journal/1674-1056,Unique_Item_Requests,7,0,0,1,2,1,1,1,0,1,0,0,0
+Journal of Cosmology and Astroparticle Physics,IOP,,IOPscience,10.1088/issn.1475-7516,iopscience:1475-7516,,1475-7516,http://iopscience.iop.org/journal/1475-7516,Unique_Item_Requests,7,0,0,0,1,4,1,1,0,0,0,0,0
+Journal of Scientific Instruments,IOP,,IOPscience,10.1088/issn.0950-7671,iopscience:0950-7671,0950-7671,,http://iopscience.iop.org/journal/0950-7671,Unique_Item_Requests,7,0,0,0,0,0,0,0,0,0,0,7,0
+Laser Physics Letters,IOP,,IOPscience,10.1088/issn.1612-202X,iopscience:1612-202X,1612-2011,1612-202X,http://iopscience.iop.org/journal/1612-202X,Unique_Item_Requests,7,0,0,0,3,2,1,1,0,0,0,0,0
+British Journal of Applied Physics,IOP,,IOPscience,10.1088/issn.0508-3443,iopscience:0508-3443,0508-3443,,http://iopscience.iop.org/journal/0508-3443,Unique_Item_Requests,6,0,0,1,1,3,0,0,0,1,0,0,0
+Journal of Physics C: Solid State Physics,IOP,,IOPscience,10.1088/issn.0022-3719,iopscience:0022-3719,0022-3719,,http://iopscience.iop.org/journal/0022-3719,Unique_Item_Requests,6,0,1,0,1,0,0,2,1,0,1,0,0
+Journal of the Electrochemical Society,IOP,,IOPscience,10.1088/issn.1945-7111,iopscience:1945-7111,0013-4651,1945-7111,http://iopscience.iop.org/journal/1945-7111,Unique_Item_Requests,6,0,0,0,0,0,0,0,4,0,0,0,2
+Sbornik: Mathematics,IOP,,IOPscience,10.1088/issn.1064-5616,iopscience:1064-5616,1064-5616,1468-4802,http://iopscience.iop.org/journal/1064-5616,Unique_Item_Requests,6,2,0,0,2,1,1,0,0,0,0,0,0
+Soviet Physics Uspekhi,IOP,,IOPscience,10.1088/issn.0038-5670,iopscience:0038-5670,0038-5670,,http://iopscience.iop.org/journal/0038-5670,Unique_Item_Requests,6,0,0,0,0,0,2,0,2,0,0,1,1
+Chinese Physics Letters,IOP,,IOPscience,10.1088/issn.0256-307X,iopscience:0256-307X,0256-307X,1741-3540,http://iopscience.iop.org/journal/0256-307X,Unique_Item_Requests,5,0,0,0,1,0,0,0,0,2,0,0,2
+Journal of Micromechanics and Microengineering,IOP,,IOPscience,10.1088/issn.0960-1317,iopscience:0960-1317,0960-1317,1361-6439,http://iopscience.iop.org/journal/0960-1317,Unique_Item_Requests,5,1,0,0,0,0,1,0,1,0,1,1,0
+Journal of Optics A: Pure and Applied Optics,IOP,,IOPscience,10.1088/issn.1464-4258,iopscience:1464-4258,1464-4258,1741-3567,http://iopscience.iop.org/journal/1464-4258,Unique_Item_Requests,5,0,0,0,3,2,0,0,0,0,0,0,0
+Metrologia,IOP,,IOPscience,10.1088/issn.0026-1394,iopscience:0026-1394,0026-1394,1681-7575,http://iopscience.iop.org/journal/0026-1394,Unique_Item_Requests,5,0,0,1,0,2,2,0,0,0,0,0,0
+Physics-Uspekhi,IOP,,IOPscience,10.1088/issn.1063-7869,iopscience:1063-7869,1063-7869,1468-4780,http://iopscience.iop.org/journal/1063-7869,Unique_Item_Requests,5,0,0,0,0,2,0,2,0,0,0,0,1
+Bioinspiration & Biomimetics,IOP,,IOPscience,10.1088/issn.1748-3190,iopscience:1748-3190,1748-3182,1748-3190,http://iopscience.iop.org/journal/1748-3190,Unique_Item_Requests,4,0,0,0,0,0,3,0,0,0,1,0,0
+Biomedical Materials,IOP,,IOPscience,10.1088/issn.1748-605X,iopscience:1748-605X,1748-6041,1748-605X,http://iopscience.iop.org/journal/1748-605X,Unique_Item_Requests,4,0,0,0,0,1,0,2,0,0,0,1,0
+Communications in Theoretical Physics,IOP,,IOPscience,10.1088/issn.0253-6102,iopscience:0253-6102,0253-6102,1572-9494,http://iopscience.iop.org/journal/0253-6102,Unique_Item_Requests,4,0,0,0,1,3,0,0,0,0,0,0,0
+Journal of Physics B: Atomic and Molecular Physics,IOP,,IOPscience,10.1088/issn.0022-3700,iopscience:0022-3700,0022-3700,,http://iopscience.iop.org/journal/0022-3700,Unique_Item_Requests,4,1,1,0,2,0,0,0,0,0,0,0,0
+Journal of Physics E: Scientific Instruments,IOP,,IOPscience,10.1088/issn.0022-3735,iopscience:0022-3735,0022-3735,,http://iopscience.iop.org/journal/0022-3735,Unique_Item_Requests,4,1,0,0,1,0,0,0,1,0,0,1,0
+Nuclear Fusion,IOP,,IOPscience,10.1088/issn.0029-5515,iopscience:0029-5515,0029-5515,1741-4326,http://iopscience.iop.org/journal/0029-5515,Unique_Item_Requests,4,0,0,0,0,2,0,0,2,0,0,0,0
+Physics Bulletin,IOP,,IOPscience,10.1088/issn.0031-9112,iopscience:0031-9112,0031-9112,,http://iopscience.iop.org/journal/0031-9112,Unique_Item_Requests,4,0,0,0,0,1,0,0,0,1,0,2,0
+Journal of Physics F: Metal Physics,IOP,,IOPscience,10.1088/issn.0305-4608,iopscience:0305-4608,0305-4608,,http://iopscience.iop.org/journal/0305-4608,Unique_Item_Requests,3,0,0,0,3,0,0,0,0,0,0,0,0
+Journal of Physics G: Nuclear and Particle Physics,IOP,,IOPscience,10.1088/issn.0954-3899,iopscience:0954-3899,0954-3899,1361-6471,http://iopscience.iop.org/journal/0954-3899,Unique_Item_Requests,3,1,0,0,0,0,0,0,0,0,2,0,0
+Journal of Semiconductors,IOP,,IOPscience,10.1088/issn.1674-4926,iopscience:1674-4926,1674-4926,2058-6140,http://iopscience.iop.org/journal/1674-4926,Unique_Item_Requests,3,0,0,1,1,0,0,0,0,0,0,1,0
+Materials Research Express,IOP,,IOPscience,10.1088/issn.2053-1591,iopscience:2053-1591,,2053-1591,http://iopscience.iop.org/journal/2053-1591,Unique_Item_Requests,3,0,0,0,0,1,1,1,0,0,0,0,0
+Proceedings of the Physical Society. Section A,IOP,,IOPscience,10.1088/issn.0370-1298,iopscience:0370-1298,0370-1298,,http://iopscience.iop.org/journal/0370-1298,Unique_Item_Requests,3,0,0,0,0,1,0,0,0,2,0,0,0
+Research Notes of the AAS,IOP,,IOPscience,10.1088/issn.2515-5172,iopscience:2515-5172,,2515-5172,http://iopscience.iop.org/journal/2515-5172,Unique_Item_Requests,3,0,0,0,0,1,1,0,1,0,0,0,0
+Russian Mathematical Surveys,IOP,,IOPscience,10.1088/issn.0036-0279,iopscience:0036-0279,0036-0279,1468-4829,http://iopscience.iop.org/journal/0036-0279,Unique_Item_Requests,3,0,0,0,0,0,0,0,0,1,0,2,0
+2D Materials,IOP,,IOPscience,10.1088/issn.2053-1583,iopscience:2053-1583,,2053-1583,http://iopscience.iop.org/journal/2053-1583,Unique_Item_Requests,2,1,0,1,0,0,0,0,0,0,0,0,0
+Inverse Problems,IOP,,IOPscience,10.1088/issn.0266-5611,iopscience:0266-5611,0266-5611,1361-6420,http://iopscience.iop.org/journal/0266-5611,Unique_Item_Requests,2,0,0,0,0,0,0,0,2,0,0,0,0
+Laser Physics,IOP,,IOPscience,10.1088/issn.1555-6611,iopscience:1555-6611,1054-660X,1555-6611,http://iopscience.iop.org/journal/1555-6611,Unique_Item_Requests,2,0,0,0,0,2,0,0,0,0,0,0,0
+Modelling and Simulation in Materials Science and Engineering,IOP,,IOPscience,10.1088/issn.0965-0393,iopscience:0965-0393,0965-0393,1361-651X,http://iopscience.iop.org/journal/0965-0393,Unique_Item_Requests,2,1,0,0,0,1,0,0,0,0,0,0,0
+Nonlinearity,IOP,,IOPscience,10.1088/issn.0951-7715,iopscience:0951-7715,0951-7715,1361-6544,http://iopscience.iop.org/journal/0951-7715,Unique_Item_Requests,2,0,0,0,1,0,0,0,0,0,0,0,1
+Physics in Medicine & Biology,IOP,,IOPscience,10.1088/issn.0031-9155,iopscience:0031-9155,0031-9155,1361-6560,http://iopscience.iop.org/journal/0031-9155,Unique_Item_Requests,2,0,0,1,0,0,0,0,0,0,1,0,0
+Quantum Electronics,IOP,,IOPscience,10.1088/issn.1063-7818,iopscience:1063-7818,1063-7818,1468-4799,http://iopscience.iop.org/journal/1063-7818,Unique_Item_Requests,2,0,0,1,0,0,0,0,0,0,1,0,0
+Research in Astronomy and Astrophysics,IOP,,IOPscience,10.1088/issn.1674-4527,iopscience:1674-4527,1674-4527,2397-6209,http://iopscience.iop.org/journal/1674-4527,Unique_Item_Requests,2,0,0,0,0,0,0,0,1,1,0,0,0
+Russian Chemical Reviews,IOP,,IOPscience,10.1088/issn.0036-021X,iopscience:0036-021X,0036-021X,1468-4837,http://iopscience.iop.org/journal/0036-021X,Unique_Item_Requests,2,0,0,0,0,0,0,1,1,0,0,0,0
+Smart Materials and Structures,IOP,,IOPscience,10.1088/issn.0964-1726,iopscience:0964-1726,0964-1726,1361-665X,http://iopscience.iop.org/journal/0964-1726,Unique_Item_Requests,2,1,0,0,1,0,0,0,0,0,0,0,0
+Surface Topography: Metrology and Properties,IOP,,IOPscience,10.1088/issn.2051-672X,iopscience:2051-672X,,2051-672X,http://iopscience.iop.org/journal/2051-672X,Unique_Item_Requests,2,0,0,0,0,0,0,0,2,0,0,0,0
+Biomedical Physics & Engineering Express,IOP,,IOPscience,10.1088/issn.2057-1976,iopscience:2057-1976,,2057-1976,http://iopscience.iop.org/journal/2057-1976,Unique_Item_Requests,1,0,0,0,0,0,0,0,0,0,0,1,0
+Clinical Physics and Physiological Measurement,IOP,,IOPscience,10.1088/issn.0143-0815,iopscience:0143-0815,0143-0815,,http://iopscience.iop.org/journal/0143-0815,Unique_Item_Requests,1,0,0,0,0,0,0,0,0,0,0,0,1
+Izvestiya: Mathematics,IOP,,IOPscience,10.1088/issn.1064-5632,iopscience:1064-5632,1064-5632,1468-4810,http://iopscience.iop.org/journal/1064-5632,Unique_Item_Requests,1,0,0,0,1,0,0,0,0,0,0,0,0
+Journal of High Energy Physics,IOP,,IOPscience,10.1088/issn.1126-6708,iopscience:1126-6708,,1029-8479,http://iopscience.iop.org/journal/1126-6708,Unique_Item_Requests,1,0,1,0,0,0,0,0,0,0,0,0,0
+Journal of Optics,IOP,,IOPscience,10.1088/issn.0150-536X,iopscience:0150-536X,0150-536X,,http://iopscience.iop.org/journal/0150-536X,Unique_Item_Requests,1,0,0,0,0,0,1,0,0,0,0,0,0
+Journal of Optics B: Quantum and Semiclassical Optics,IOP,,IOPscience,10.1088/issn.1464-4266,iopscience:1464-4266,1464-4266,1741-3575,http://iopscience.iop.org/journal/1464-4266,Unique_Item_Requests,1,0,0,0,0,0,0,0,0,0,0,1,0
+Journal of Physics A: Mathematical Nuclear and General,IOP,,IOPscience,10.1088/issn.0301-0015,iopscience:0301-0015,0301-0015,,http://iopscience.iop.org/journal/0301-0015,Unique_Item_Requests,1,0,0,0,0,0,1,0,0,0,0,0,0
+Journal of Radiological Protection,IOP,,IOPscience,10.1088/issn.0952-4746,iopscience:0952-4746,0952-4746,1361-6498,http://iopscience.iop.org/journal/0952-4746,Unique_Item_Requests,1,0,0,1,0,0,0,0,0,0,0,0,0
+Mathematics of the USSR-Sbornik,IOP,,IOPscience,10.1088/issn.0025-5734,iopscience:0025-5734,0025-5734,,http://iopscience.iop.org/journal/0025-5734,Unique_Item_Requests,1,0,0,0,0,1,0,0,0,0,0,0,0
+Methods and Applications in Fluorescence,IOP,,IOPscience,10.1088/issn.2050-6120,iopscience:2050-6120,,2050-6120,http://iopscience.iop.org/journal/2050-6120,Unique_Item_Requests,1,0,0,0,0,1,0,0,0,0,0,0,0
+Physics World,IOP,,IOPscience,10.1088/issn.2058-7058,iopscience:2058-7058,0953-8585,2058-7058,http://iopscience.iop.org/journal/2058-7058,Unique_Item_Requests,1,0,0,0,0,1,0,0,0,0,0,0,0
+Plasma Physics and Controlled Fusion,IOP,,IOPscience,10.1088/issn.0741-3335,iopscience:0741-3335,0741-3335,1361-6587,http://iopscience.iop.org/journal/0741-3335,Unique_Item_Requests,1,0,0,0,1,0,0,0,0,0,0,0,0
+Plasma Science and Technology,IOP,,IOPscience,10.1088/issn.1009-0630,iopscience:1009-0630,1009-0630,2058-6272,http://iopscience.iop.org/journal/1009-0630,Unique_Item_Requests,1,0,0,0,0,1,0,0,0,0,0,0,0
+Proceedings of the Physical Society,IOP,,IOPscience,10.1088/issn.0370-1328,iopscience:0370-1328,0370-1328,,http://iopscience.iop.org/journal/0370-1328,Unique_Item_Requests,1,0,0,0,0,0,1,0,0,0,0,0,0
+Progress in Energy,IOP,,IOPscience,10.1088/issn.2516-1083,iopscience:2516-1083,,2516-1083,http://iopscience.iop.org/journal/2516-1083,Unique_Item_Requests,1,0,0,0,0,0,0,0,0,1,0,0,0
+Semiconductor Science and Technology,IOP,,IOPscience,10.1088/issn.0268-1242,iopscience:0268-1242,0268-1242,1361-6641,http://iopscience.iop.org/journal/0268-1242,Unique_Item_Requests,1,0,0,0,0,0,0,1,0,0,0,0,0
+Soviet Journal of Quantum Electronics,IOP,,IOPscience,10.1088/issn.0049-1748,iopscience:0049-1748,0049-1748,,http://iopscience.iop.org/journal/0049-1748,Unique_Item_Requests,1,0,0,0,0,0,0,0,0,1,0,0,0
+Superconductor Science and Technology,IOP,,IOPscience,10.1088/issn.0953-2048,iopscience:0953-2048,0953-2048,1361-6668,http://iopscience.iop.org/journal/0953-2048,Unique_Item_Requests,1,0,0,0,1,0,0,0,0,0,0,0,0
+Total unique item requests:,,,,,,,,,,1616,,,,,,,,,,,,
