@@ -14,6 +14,11 @@ from collections import defaultdict
 # Need of title and icon
 st.set_page_config(layout="wide", page_icon=None, page_title=None)
 
+# primary_clr = st.get_option("theme.primaryColor")
+# txt_clr = st.get_option("theme.textColor")
+# # I want 3 colours to graph, so this is a red that matches the theme:
+# second_clr = "#d87c7c"
+
 st.title('WELCOME')
 st.header("This website is the new way to visualize data from your TR_J1 Reports!")
 
@@ -66,7 +71,7 @@ else:
 
 # display dataframe, can be removed
 st.dataframe(df)
-st.write(rpt)
+st.header("Overall, the reporting period total consists of " + str(rpt) + " journals.")
 
 
 
@@ -78,7 +83,8 @@ if not cost or cost < 0:
     st.warning("Please input a valid cost!", icon="⚠️")
 else:
     st.subheader("Based on your input, your total cost per use is calculated below")
-    st.write(cost/rpt)
+    cpt = format(cost/rpt, ".2f")
+    st.write(cpt)
 
 
 # using counter to get occurences of each num
