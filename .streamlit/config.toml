@@ -2,23 +2,29 @@
 
 # Used to style primary interface elements. It's the color displayed most frequently across your app's
 # screens and components. Examples of widgets using this color are st.slider and st.checkbox.
-primaryColor = "#919e8b" # green
+#primaryColor = "#919e8b" # green
+primaryColor = "#2D9800"
 
 # Background color for the main container.
-backgroundColor = "rgba(254,248,239,1)" # sepia yellow
+#backgroundColor = "rgba(254,248,239,1)" # sepia yellow
 #backgroundColor= "#AA96DA"
-#backgroundColor = "FF0FFF"
-
+#backgroundColor = "#000000"
 #backgroundColor = "#AA96DA"
+#backgroundColor = "#7570b3"
+backgroundColor = "#D6D6D6"
 
 # Used as the background for most widgets. Examples of widgets with this background are st.sidebar,
 # st.text_input, st.date_input.
-secondaryBackgroundColor =  "#ebd2b9" # wheat  "#d7ab82" # yellow <-- not enough contrast
+#secondaryBackgroundColor =  "#ebd2b9" # wheat  "#d7ab82" # yellow <-- not enough contrast
 #secondaryBackgroundColor = "#AA96DA"
+#secondaryBackgroundColor  = "#7570b3"
+#secondaryBackgroundColor = "#A2A2A2"
 
 # Font color for the page.
-textColor = "#0e0e0e" # grey
+#textColor = "#0e0e0e" # grey
+#textColor = "#1b9e77"
+textColor = "#187D5F"
 
 # Font family (serif | sans serif | mono) for the page. Will not impact code areas.
 # Default: "sans serif"
-font = "sans serif"
+font = "serif"

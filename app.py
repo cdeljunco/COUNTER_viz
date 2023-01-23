@@ -6,6 +6,7 @@ import streamlit.components.v1 as components
 import json
 import collections
 from collections import defaultdict
+from PIL import Image
 
 # HOW TO RUN APP?
 #streamlit run app.py
@@ -18,14 +19,15 @@ st.set_page_config(layout="wide", page_icon=None, page_title=None)
 # txt_clr = st.get_option("theme.textColor")
 # # I want 3 colours to graph, so this is a red that matches the theme:
 # second_clr = "#d87c7c"
-
-st.title('WELCOME')
+image = Image.open('wesleyan.jpeg')
+st.image(image)
+# st.title('WELCOME')
 st.header("This website is the new way to visualize data from your TR_J1 Reports!")
 
 
 
 # upload file - of type csv, json, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
-file_upload = st.file_uploader("Must be a .csv, .tsv, .xlsx, or .json file", type=['csv', 'tsv', 'xlsx', 'json'])
+file_upload = st.file_uploader("", type=['csv', 'tsv', 'xlsx', 'json'])
 
 df = pd.DataFrame()
 
@@ -69,11 +71,6 @@ if df.iat[len(df)-1, 0] == "Total unique item requests:":   # check if sum exist
 else:
     rpt = df['Reporting_Period_Total'].sum()
 
-# display dataframe, can be removed
-st.dataframe(df)
-st.header("Overall, the reporting period total consists of " + str(rpt) + " journals.")
-
-
 
 ############### Streamlit: Displaying Data #################
 
@@ -90,18 +87,12 @@ else:
 # using counter to get occurences of each num
 occurrences = collections.Counter(df["Reporting_Period_Total"])
 
-st.write("Displaying overall occurences of each reporting period number:")
-st.write(occurrences)
-# st.write(type(occurrences))
-
 titles = defaultdict(list)
 
 #There must be at least one book linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
 for index, row in df.iterrows():
     titles[row["Reporting_Period_Total"]].append(row['Title'])
 
-st.write("Displaying the uses associated to each book:")
-st.write(titles)
 
 # data that was produced to create histogram
 data = {
@@ -114,35 +105,34 @@ data = {
 usage_df = pd.DataFrame(data)
 
 # st.write(data)
-st.write("Displaying reporting period total, linked with number of books and it's title ")
-st.dataframe(usage_df, use_container_width=True)
+# st.write("Displaying reporting period total, linked with number of books and it's title.")
+with st.expander("Expand to see the full list of titles associated with each request:", expanded=False):
+    st.dataframe(usage_df, use_container_width=True)
 
-st.subheader("Usage Distribution") # num of jounals : y axis, num of uses : x axis
-auth_hist = alt.Chart(usage_df).mark_bar(
-    size= 20,
-    cornerRadiusTopLeft=3,
-    cornerRadiusTopRight=3,
-).encode(
-    alt.X("Reporting_Period_Total"),
-    alt.Y("Occurrences"),
-    tooltip=['Titles','Occurrences', 'Reporting_Period_Total'],
+st.subheader("Usage Distribution")
+stacked_df = df
+stacked_hist = alt.Chart(stacked_df).mark_bar(width=10).encode(
+    alt.X("Reporting_Period_Total:Q",title="Reporting Period Total"),
+    alt.Y("count()",axis=alt.Axis(grid=False),title="Occurrences"),
+    alt.Detail("Title"),
+    alt.Color("Title", legend = None),
+    # alt.BarConfig(color = "#FF0000"),
+    tooltip=["Title","Reporting_Period_Total"],
+    # color = "Title"
 ).interactive().properties(
-    height = 600,
+    height = 400,
     title={
         "text": ["Usage Distribution per book"],
         "subtitle": ["Hover over the bar for more details on specific book titles"],
         "color": "black",
         "subtitleColor": "gray"
     }
-).configure_scale(bandPaddingInner=0)
+)
 
-# .configure_range(
-#     category=[primary_clr,second_clr,txt_clr]
-# ).interactive()
+st.altair_chart(stacked_hist, use_container_width=True)
 
-st.altair_chart(auth_hist, use_container_width=True)
-
-
+# config = alt.Legend(titleColor='black', labelFontSize=14) 
+# config
 
 ###########OTHER###################
 #reset row indices after removing first 13 rows
@@ -246,13 +236,7 @@ st.altair_chart(auth_hist, use_container_width=True)
 '''
 Next Steps:
 
-Refining histogram - stacked journals
-Journals not books lol
-collapasable df - modal or toggle bootstrap
-json?
-
-
-colorblind friendly 
-screen-reader find with streamlit/altair stuff
-
+colorblind friendly?
+JSON!
+fix chart gaps
 '''

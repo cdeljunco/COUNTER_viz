@@ -15,6 +15,11 @@ txt_clr = st.get_option("theme.textColor")
 # I want 3 colours to graph, so this is a red that matches the theme:
 second_clr = "#d87c7c"
 
+# AlT
+# #d95f02
+# #1b9e77
+# #7570b3
+
 # bootstrap 4 collapse example
 # components.html(
 #     """
