@@ -8,30 +8,26 @@ import collections
 from collections import defaultdict
 from PIL import Image
 
-# HOW TO RUN APP?
-#streamlit run app.py
-
-###############START OF PAGE##################
-# Need of title and icon
-st.set_page_config(layout="wide", page_icon=None, page_title=None)
+# Set the layout of the Streamlit
+st.set_page_config(layout="wide", page_icon=None, page_title="Counter Visualization")
 
 # primary_clr = st.get_option("theme.primaryColor")
 # txt_clr = st.get_option("theme.textColor")
 # # I want 3 colours to graph, so this is a red that matches the theme:
 # second_clr = "#d87c7c"
-image = Image.open('wesleyan.jpeg')
+
+#Main image and header 
+image = Image.open('header.jfif')
 st.image(image)
-# st.title('WELCOME')
 st.header("This website is the new way to visualize data from your TR_J1 Reports!")
 
-
-
-# upload file - of type csv, json, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
+# Upload file - of type csv, json, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
 file_upload = st.file_uploader("", type=['csv', 'tsv', 'xlsx', 'json'])
 
+# Create a variable to represent an empty Panda Dataframe
 df = pd.DataFrame()
 
-# upload file -- decision tree for file types
+# Decision Tree to upload the files
 if file_upload:
     if file_upload.type == "text/csv":
         df = pd.read_csv(file_upload, skiprows=13)
@@ -75,7 +71,7 @@ else:
 ############### Streamlit: Displaying Data #################
 
 # cost input, shows warning alert if no input, else success alert and display cost per report
-cost = st.number_input('Please Input Cost:', min_value=0.00)
+cost = st.number_input('Please Input journal package cost:', min_value=0.00)
 if not cost or cost < 0:
     st.warning("Please input a valid cost!", icon="⚠️")
 else:
@@ -96,147 +92,26 @@ for index, row in df.iterrows():
 
 # data that was produced to create histogram
 data = {
-    "Reporting_Period_Total": [key for key, _ in occurrences.items()],
-    "Occurrences": [val for _, val in occurrences.items()],
-    "Titles": [val for _, val in titles.items()]
+    "Reporting Period Total": [key for key, _ in occurrences.items()],
+    "Number of Journals": [val for _, val in occurrences.items()],
+    "Titles (Double click to see full list)": [val for _, val in titles.items()]
 }
-
-
 usage_df = pd.DataFrame(data)
+max_count = usage_df["Number of Journals"].max()
+max_report = usage_df["Reporting Period Total"].max()
+st.text(max_count)
+st.text(max_report)
 
-# st.write(data)
-# st.write("Displaying reporting period total, linked with number of books and it's title.")
+st.subheader("Usage Distribution")
 with st.expander("Expand to see the full list of titles associated with each request:", expanded=False):
     st.dataframe(usage_df, use_container_width=True)
 
-st.subheader("Usage Distribution")
 stacked_df = df
 stacked_hist = alt.Chart(stacked_df).mark_bar(width=10).encode(
     alt.X("Reporting_Period_Total:Q",title="Reporting Period Total"),
     alt.Y("count()",axis=alt.Axis(grid=False),title="Occurrences"),
     alt.Detail("Title"),
     alt.Color("Title", legend = None),
-    # alt.BarConfig(color = "#FF0000"),
     tooltip=["Title","Reporting_Period_Total"],
-    # color = "Title"
-).interactive().properties(
-    height = 400,
-    title={
-        "text": ["Usage Distribution per book"],
-        "subtitle": ["Hover over the bar for more details on specific book titles"],
-        "color": "black",
-        "subtitleColor": "gray"
-    }
-)
-
+).interactive()
 st.altair_chart(stacked_hist, use_container_width=True)
-
-# config = alt.Legend(titleColor='black', labelFontSize=14) 
-# config
-
-###########OTHER###################
-#reset row indices after removing first 13 rows
-# df.reset_index(drop=True, inplace=True)
-# df.replace(np.nan, 0, regex=True, inplace = True)
-
-# REMOVE LAST ROW (TOTAL UNIQUE REQUESTS) AND SAVE IT INTO VAR
-# total_unique_requests = df.iloc[[len(df)-1]]
-# print(total_unique_requests.to_string())
-# df = df.iloc[:len(df)-1]
-
-# #Use css file to style
-# with open ('style.css') as f:
-#     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
-
-# st.subheader('Look into the authorships, citations, and downloads of each journal')
-# auth_hist = alt.Chart(df).mark_bar(width=10).encode(
-#     alt.X('authorships:Q', title="Authorships (average per year over the next five years)"),
-#     alt.Y('count()', axis=alt.Axis(grid=False)),
-#     alt.Detail('index'),
-#     tooltip=['title', 'authorships', 'subscription_cost', 'subscribed'],
-#     color=alt.Color('subscribed:N', scale=subscribed_colorscale)
-#     ).interactive().properties(
-#         height=400,
-#         title={
-#             "text": ["Authorships Distribution"],
-#             "subtitle": ["What do the range of Authorships look like?", "Use this graph to help set the Authorships slider filter and narrow down titles of interest"],
-#             "color": "black",
-#             "subtitleColor": "gray"
-#         }
-#         )
-# st.altair_chart(auth_hist, use_container_width=True)
-
-
-
-
-
-
-
-
-# subscribed_colorscale = alt.Scale(domain = ['TRUE', 'FALSE', 'MAYBE', ' '],
-#                                   range = ['blue', 'red', 'green', 'gray'])
-
-# x = st.slider('Select a value', key=0)
-# st.write(x, 'squared is', x * x)
-
-# y = st.slider('Select a value', key=1)
-# st.write(y, 'squared is', y * y * y)
-
-# color = st.select_slider(
-#     'Select a color of the rainbow',
-#     options=['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'])
-# st.write('My favorite color is', color)
-
-
-# components.html(
-#     """
-# <html>
-# <body>
-# <script>var clicky_site_ids = clicky_site_ids || []; clicky_site_ids.push(101315881);</script>
-# <script async src="//static.getclicky.com/js"></script>
-# <noscript><p><img alt="Clicky" width="1" height="1" src="//in.getclicky.com/101315881ns.gif" /></p></noscript>
-# </body>
-# </html>
-#     """
-# )
-
-
-# st.subheader('Look into the authorships, citations, and downloads of each journal')
-# auth_hist = alt.Chart(df).mark_bar(width=10).encode(
-#     alt.X('authorships:Q', title="Authorships (average per year over the next five years)"),
-#     alt.Y('count()', axis=alt.Axis(grid=False)),
-#     alt.Detail('index'),
-#     tooltip=['title', 'authorships', 'subscription_cost', 'subscribed'],
-#     color=alt.Color('subscribed:N', scale=subscribed_colorscale)
-#     ).interactive().properties(
-#         height=400,
-#         title={
-#             "text": ["Authorships Distribution"],
-#             "subtitle": ["What do the range of Authorships look like?", "Use this graph to help set the Authorships slider filter and narrow down titles of interest"],
-#             "color": "black",
-#             "subtitleColor": "gray"
-#         }
-#         )
-# st.altair_chart(auth_hist, use_container_width=True)
-# https://realpython.com/python-csv/
-
-
-# P1 (First priority):
-# Read in 1 COUNTER TR_J1 sheet
-# Read in 1 user-inputed cost for all journals in the sheet
-# Calculate cost per use 
-# Plot histogram of use distribution with possibility to hover to see different journals 
-# Interactivity with histogram
-# Save plots to png or svg (or other desired formats)
-
-# How do we calculate cost per use?
-# Plot histogram of use distribution with possibility to hover to see different journals 
-
-
-'''
-Next Steps:
-
-colorblind friendly?
-JSON!
-fix chart gaps
-'''
