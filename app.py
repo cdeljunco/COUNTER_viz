@@ -71,13 +71,13 @@ else:
 ############### Streamlit: Displaying Data #################
 
 # cost input, shows warning alert if no input, else success alert and display cost per report
-cost = st.number_input('Please Input journal package cost:', min_value=0.00)
+cost = st.number_input('Please Input journal package cost in dollar:', min_value = 0.00, format="%f")
 if not cost or cost < 0:
     st.warning("Please input a valid cost!", icon="⚠️")
 else:
     st.subheader("Based on your input, your total cost per use is calculated below")
     cpt = format(cost/rpt, ".2f")
-    st.write(cpt)
+    st.write("$ " + cpt)
 
 
 # using counter to get occurences of each num
@@ -85,33 +85,42 @@ occurrences = collections.Counter(df["Reporting_Period_Total"])
 
 titles = defaultdict(list)
 
-#There must be at least one book linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
+#There must be at least one journal linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
 for index, row in df.iterrows():
     titles[row["Reporting_Period_Total"]].append(row['Title'])
 
-
-# data that was produced to create histogram
+# create a dictionary that would contain the count numbers, the reporting total, and the titles of the journals
 data = {
     "Reporting Period Total": [key for key, _ in occurrences.items()],
     "Number of Journals": [val for _, val in occurrences.items()],
     "Titles (Double click to see full list)": [val for _, val in titles.items()]
 }
+
+# create a dataframe from the dicitionary created earlier so it could be later be dsiplayed or performed with other python functions 
 usage_df = pd.DataFrame(data)
+# determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
 max_count = usage_df["Number of Journals"].max()
 max_report = usage_df["Reporting Period Total"].max()
-st.text(max_count)
-st.text(max_report)
+chartHeight = 0
+#condition to determine the height for the histogram 
+if max_count >= 500:
+    chartHeight = max_count
+else:
+    chartHeight = 500
+
 
 st.subheader("Usage Distribution")
+#creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
 with st.expander("Expand to see the full list of titles associated with each request:", expanded=False):
     st.dataframe(usage_df, use_container_width=True)
 
+#Responsible for the histogram based on Altair Vega Lite and St.altair_chart
 stacked_df = df
 stacked_hist = alt.Chart(stacked_df).mark_bar(width=10).encode(
-    alt.X("Reporting_Period_Total:Q",title="Reporting Period Total"),
+    alt.X("Reporting_Period_Total:Q",scale = alt.Scale(domain=[0,max_report]),title="Reporting Period Total"),
     alt.Y("count()",axis=alt.Axis(grid=False),title="Occurrences"),
     alt.Detail("Title"),
     alt.Color("Title", legend = None),
     tooltip=["Title","Reporting_Period_Total"],
-).interactive()
+).interactive().configure_view(height = chartHeight)
 st.altair_chart(stacked_hist, use_container_width=True)
