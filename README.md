@@ -2,7 +2,7 @@
 
 # COUNTER_viz
 
-**Before getting started, make sure you have downloaded all of the proper packages and dependencies. For simplicity we will be using pip to install all packages required for this project.**
+**Before getting started, make sure you have downloaded all of the proper packages and dependencies.**
 
 ## Prerequisites
 
