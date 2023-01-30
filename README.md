@@ -34,7 +34,7 @@ python -m ensurepip --upgrade
 pip install streamlit
 ```
 
-# Run Streamlit App
+# Run Streamlit App 
 
 1. Clone the streamlit app to a directory of choice
 
@@ -47,3 +47,6 @@ git clone git@github.com:cdeljunco/COUNTER_viz.git
 ```python
 streamlit run app.py
 ```
+
+:warning: **Make sure that you are running on Streamlit version 1.15.1 or later.**
+
