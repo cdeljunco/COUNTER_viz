@@ -32,16 +32,11 @@ if file_upload:
     if file_upload.type == "text/csv":
         df = pd.read_csv(file_upload, skiprows=13)
     elif file_upload.type == "application/json":
-        # file_upload = file_upload["Report_Items"]
-        # file_upload = json.load(file_upload)
-        # json_file = json.load(file_upload)
-        # print(file_upload)
         json_temp = json.load(file_upload)
         file_upload = json_temp["Report_Items"]
         st.json(json_temp)
         df = file_upload
-        # file_upload.remove("Report_Header")
-        # df = pd.read_json(file_upload)
+        #df = pd.read_json(file_upload)
     elif file_upload.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": #xslx file
         df = pd.read_excel(file_upload, skiprows=13)
     elif file_upload.type == "text/tab-separated-values":
@@ -55,10 +50,23 @@ else:
 
 
 # cleaning data by dropping unecessary rows and coverting NaN types to 0
-df = df.drop(columns=["Publisher","Publisher_ID","Platform","DOI","Proprietary_ID","Print_ISSN","Online_ISSN","URI","Metric_Type"])
+df = df.drop(columns=["Publisher","Publisher_ID","Platform","DOI","Proprietary_ID","Print_ISSN","Online_ISSN","URI"])
 df.replace(np.nan, 0, regex=True, inplace = True)
 
 
+############### Streamlit radio for Metric Type ##############
+metric_choice = st.radio(
+    "Please select a Metric Type",
+    ("Unique Item Requests","Total Item Requests")
+)
+
+if metric_choice == "Unique Item Requests":
+    df = df.loc[df['Metric_Type'] == "Unique_Item_Requests"]
+    df = df.drop(columns="Metric_Type")
+else:
+    df = df.loc[df['Metric_Type'] == "Total_Item_Requests"]
+    df = df.drop(columns="Metric_Type")
+################ Determine the report total based on whether "Total Unqiue Item Requests" exist in the "Title" column
 
 # if df contains row for reporting period total, take that, else sum column
 if df.iat[len(df)-1, 0] == "Total unique item requests:":   # check if sum exists in file
@@ -66,7 +74,6 @@ if df.iat[len(df)-1, 0] == "Total unique item requests:":   # check if sum exist
     df = df.iloc[:len(df)-1]
 else:
     rpt = df['Reporting_Period_Total'].sum()
-
 
 ############### Streamlit: Displaying Data #################
 
@@ -104,7 +111,10 @@ max_report = usage_df["Reporting Period Total"].max()
 chartHeight = 0
 #condition to determine the height for the histogram 
 if max_count >= 500:
-    chartHeight = max_count
+    if max_count >= 800:
+        chartHeight = 800
+    else:
+        chartHeight = max_count
 else:
     chartHeight = 500
 
@@ -118,7 +128,7 @@ with st.expander("Expand to see the full list of titles associated with each req
 stacked_df = df
 stacked_hist = alt.Chart(stacked_df).mark_bar(width=10).encode(
     alt.X("Reporting_Period_Total:Q",scale = alt.Scale(domain=[0,max_report]),title="Reporting Period Total"),
-    alt.Y("count()",axis=alt.Axis(grid=False),title="Occurrences"),
+    alt.Y("count()",axis=alt.Axis(grid=False),title="Number of Journals"),
     alt.Detail("Title"),
     alt.Color("Title", legend = None),
     tooltip=["Title","Reporting_Period_Total"],
