@@ -55,10 +55,25 @@ df.replace(np.nan, 0, regex=True, inplace = True)
 
 
 ############### Streamlit radio for Metric Type ##############
-metric_choice = st.radio(
+#Decision Tree for whether there exists more than one metric type on file
+if 'Unique_Item_Requests' in df['Metric_Type'].values and "Total_Item_Requests" in df['Metric_Type'].values:
+    metric_choice = st.radio(
     "Please select a Metric Type",
     ("Unique Item Requests","Total Item Requests")
-)
+    )
+elif 'Unique_Item_Requests' in df['Metric_Type'].values and "Total_Item_Requests" not in df['Metric_Type'].values:
+    metric_choice = st.radio(
+    "Please select a Metric Type",
+    ("Unique Item Requests","Total Item Requests"), disabled=True
+    )
+elif 'Unique_Item_Requests' not in df['Metric_Type'].values and "Total_Item_Requests" in df['Metric_Type'].values:
+    metric_choice = st.radio(
+    "Please select a Metric Type",
+    ("Total Item Requests","Unique Item Requests"), disabled=True
+    )
+else:
+    st.warning(st.warning('Please make sure that you have a valid metric type of Total Item Requests or Unique Item Requests', icon="⚠️"))
+
 
 if metric_choice == "Unique Item Requests":
     df = df.loc[df['Metric_Type'] == "Unique_Item_Requests"]
