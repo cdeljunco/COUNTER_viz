@@ -22,7 +22,7 @@ st.image(image)
 st.header("This website is the new way to visualize data from your TR_J1 Reports!")
 
 # Upload file - of type csv, json, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
-file_upload = st.file_uploader("", type=['csv', 'tsv', 'xlsx', 'json'])
+file_upload = st.file_uploader("file upload", type=['csv', 'tsv', 'xlsx', 'json'], label_visibility="hidden")
 
 # Create a variable to represent an empty Panda Dataframe
 df = pd.DataFrame()
@@ -30,7 +30,7 @@ df = pd.DataFrame()
 # Decision Tree to upload the files
 if file_upload:
     if file_upload.type == "text/csv":
-        df = pd.read_csv(file_upload, skiprows=13)
+        df = pd.read_csv(file_upload, skiprows=13, index_col=False)
     elif file_upload.type == "application/json":
         json_temp = json.load(file_upload)
         file_upload = json_temp["Report_Items"]
@@ -45,7 +45,7 @@ if file_upload:
         st.warning('Please upload a file of the correct type as listed above.', icon="⚠️")
     st.success("File Uploaded!", icon="✅")
 else:
-    df = pd.read_csv("./IOP-JR1_TR_J1-FY19 to FY22 - TR_J1-FY20.csv", skiprows=13) # use default data
+    df = pd.read_csv("./IOP-JR1_TR_J1-FY19 to FY22 - TR_J1-FY20.csv", skiprows=13, index_col=False) # use default data
 
 
 
@@ -93,7 +93,7 @@ else:
 ############### Streamlit: Displaying Data #################
 
 # cost input, shows warning alert if no input, else success alert and display cost per report
-cost = st.number_input('Please Input journal package cost in dollar:', min_value = 0.00, format="%f")
+cost = st.number_input('Please input journal package cost in dollar amount:', min_value = 0.00, format="%f")
 if not cost or cost < 0:
     st.warning("Please input a valid cost!", icon="⚠️")
 else:
@@ -104,7 +104,6 @@ else:
 
 # using counter to get occurences of each num
 occurrences = collections.Counter(df["Reporting_Period_Total"])
-
 titles = defaultdict(list)
 
 #There must be at least one journal linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
@@ -137,6 +136,8 @@ else:
 st.subheader("Usage Distribution")
 #creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
 with st.expander("Expand to see the full list of titles associated with each request:", expanded=False):
+    st.write("#") # spacing between text
+    st.caption("Click on column title to order by ascending/descending order")
     st.dataframe(usage_df, use_container_width=True)
 
 #Responsible for the histogram based on Altair Vega Lite and St.altair_chart
@@ -148,4 +149,6 @@ stacked_hist = alt.Chart(stacked_df).mark_bar(width=10).encode(
     alt.Color("Title", legend = None),
     tooltip=["Title","Reporting_Period_Total"],
 ).interactive().configure_view(height = chartHeight)
+st.write("#") # simple spacer
 st.altair_chart(stacked_hist, use_container_width=True)
+st.markdown("<p style='text-align: center;'>Click on the three dots on the top right to download the chart as an SVG/PNG.</p>", unsafe_allow_html=True)
