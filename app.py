@@ -45,7 +45,7 @@ if file_upload:
         st.warning('Please upload a file of the correct type as listed above.', icon="⚠️")
     st.success("File Uploaded!", icon="✅")
 else:
-    df = pd.read_csv("./IOP-JR1_TR_J1-FY19 to FY22 - TR_J1-FY20.csv", skiprows=13, index_col=False) # use default data
+    df = pd.read_csv("Royal Society of Chemistry-TR_J1-2020 July-2022 June.csv", skiprows=13, index_col=False) # use default data
 
 
 
