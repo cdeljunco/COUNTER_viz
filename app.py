@@ -5,6 +5,7 @@ import altair as alt
 import streamlit.components.v1 as components
 import json
 import collections
+import random
 from collections import defaultdict
 from PIL import Image
 
@@ -21,8 +22,8 @@ image = Image.open('header.jfif')
 st.image(image)
 st.header("This website is the new way to visualize data from your TR_J1 Reports!")
 
-# Upload file - of type csv, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
-file_upload = st.file_uploader("file upload", type=['csv', 'tsv', 'xlsx'], label_visibility="hidden")
+# Upload file - of type csv, json, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
+file_upload = st.file_uploader("file upload", type=['csv', 'tsv', 'xlsx', 'json'], label_visibility="hidden")
 
 # Create a variable to represent an empty Panda Dataframe
 df = pd.DataFrame()
@@ -31,6 +32,12 @@ df = pd.DataFrame()
 if file_upload:
     if file_upload.type == "text/csv":
         df = pd.read_csv(file_upload, skiprows=13, index_col=False)
+    elif file_upload.type == "application/json":
+        json_temp = json.load(file_upload)
+        file_upload = json_temp["Report_Items"]
+        st.json(json_temp)
+        df = file_upload
+        #df = pd.read_json(file_upload)
     elif file_upload.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": #xslx file
         df = pd.read_excel(file_upload, skiprows=13)
     elif file_upload.type == "text/tab-separated-values":
@@ -111,17 +118,16 @@ data = {
     "Titles (Double click to see full list)": [val for _, val in titles.items()]
 }
 
-# create a dataframe from the dictionary created earlier so it could be later be dsiplayed or performed with other python functions 
+# create a dataframe from the dicitionary created earlier so it could be later be dsiplayed or performed with other python functions 
 usage_df = pd.DataFrame(data)
-
 # determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
 max_count = usage_df["Number of Journals"].max()
 max_report = usage_df["Reporting Period Total"].max()
 chartHeight = 0
 #condition to determine the height for the histogram 
-if max_count >= 500:
-    if max_count >= 800:
-        chartHeight = 800
+if max_count >= 300:
+    if max_count >= 300 & max_count <= 600:
+        chartHeight = 600
     else:
         chartHeight = max_count
 else:
@@ -136,12 +142,15 @@ with st.expander("Expand to see the full list of titles associated with each req
     st.dataframe(usage_df, use_container_width=True)
 
 #Responsible for the histogram based on Altair Vega Lite and St.altair_chart
+get_colors = lambda n: ["#%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
+color_blind_friendly = ["#0077bb","#33bbee","#009988","#ee7733","#cc3311","#ee3377","#bbbbbb"]
+get_colors(50)
 stacked_df = df
-stacked_hist = alt.Chart(stacked_df).mark_bar(width=10).encode(
+stacked_hist = alt.Chart(stacked_df).mark_bar(width=3).encode(
     alt.X("Reporting_Period_Total:Q",scale = alt.Scale(domain=[0,max_report]),title="Reporting Period Total"),
     alt.Y("count()",axis=alt.Axis(grid=False),title="Number of Journals"),
     alt.Detail("Title"),
-    alt.Color("Title", legend = None),
+    alt.Color("Title", legend = None, scale=alt.Scale(domain=[title for title in df["Title"]], range=color_blind_friendly)),
     tooltip=["Title","Reporting_Period_Total"],
 ).interactive().configure_view(height = chartHeight)
 st.write("#") # simple spacer
