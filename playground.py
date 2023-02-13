@@ -292,6 +292,14 @@ st.altair_chart(auth_hist, use_container_width=True)
 # Plot histogram of use distribution with possibility to hover to see different journals 
 
 
+    # elif file_upload.type == "application/json":
+    #     json_temp = json.load(file_upload)
+    #     file_upload = json_temp["Report_Items"]
+    #     st.json(json_temp)
+    #     df = file_upload
+    #     #df = pd.read_json(file_upload)
+
+
 '''
 Next Steps:
 

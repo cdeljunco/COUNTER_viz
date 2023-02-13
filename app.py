@@ -21,8 +21,8 @@ image = Image.open('header.jfif')
 st.image(image)
 st.header("This website is the new way to visualize data from your TR_J1 Reports!")
 
-# Upload file - of type csv, json, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
-file_upload = st.file_uploader("file upload", type=['csv', 'tsv', 'xlsx', 'json'], label_visibility="hidden")
+# Upload file - of type csv, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
+file_upload = st.file_uploader("file upload", type=['csv', 'tsv', 'xlsx'], label_visibility="hidden")
 
 # Create a variable to represent an empty Panda Dataframe
 df = pd.DataFrame()
@@ -31,12 +31,6 @@ df = pd.DataFrame()
 if file_upload:
     if file_upload.type == "text/csv":
         df = pd.read_csv(file_upload, skiprows=13, index_col=False)
-    elif file_upload.type == "application/json":
-        json_temp = json.load(file_upload)
-        file_upload = json_temp["Report_Items"]
-        st.json(json_temp)
-        df = file_upload
-        #df = pd.read_json(file_upload)
     elif file_upload.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": #xslx file
         df = pd.read_excel(file_upload, skiprows=13)
     elif file_upload.type == "text/tab-separated-values":
@@ -117,8 +111,9 @@ data = {
     "Titles (Double click to see full list)": [val for _, val in titles.items()]
 }
 
-# create a dataframe from the dicitionary created earlier so it could be later be dsiplayed or performed with other python functions 
+# create a dataframe from the dictionary created earlier so it could be later be dsiplayed or performed with other python functions 
 usage_df = pd.DataFrame(data)
+
 # determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
 max_count = usage_df["Number of Journals"].max()
 max_report = usage_df["Reporting Period Total"].max()
