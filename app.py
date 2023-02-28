@@ -23,7 +23,7 @@ st.image(image)
 st.header("This website is the new way to visualize data from your TR_J1 Reports!")
 
 # Upload file - of type csv, json, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
-file_upload = st.file_uploader("file upload", type=['csv', 'tsv', 'xlsx', 'json'], label_visibility="hidden")
+file_upload = st.file_uploader("file upload", type=['csv', 'tsv', 'xlsx', 'json'], label_visibility="hidden", accept_multiple_files=True)
 
 # Create a variable to represent an empty Panda Dataframe
 df = pd.DataFrame()
