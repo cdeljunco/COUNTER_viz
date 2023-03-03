@@ -13,7 +13,8 @@ primaryColor = "#178582"
 #backgroundColor = "#AA96DA"
 #backgroundColor = "#7570b3"
 #backgroundColor = "#D6D6D6"
-backgroundColor="#0a1828"
+#backgroundColor="#0a1828"
+backgroundColor = "#0E2439"
 
 # Used as the background for most widgets. Examples of widgets with this background are st.sidebar,
 # st.text_input, st.date_input.
@@ -27,7 +28,8 @@ secondaryBackgroundColor="#1a1a19"
 #textColor = "#0e0e0e" # grey
 #textColor = "#1b9e77"
 #textColor = "#187D5F"
-textColor="#bfa181"
+#textColor="#bfa181"
+textColor = "#FFCF96"
 
 # Font family (serif | sans serif | mono) for the page. Will not impact code areas.
 # Default: "sans serif"
