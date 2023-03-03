@@ -8,6 +8,8 @@ import collections
 import random
 from collections import defaultdict
 from PIL import Image
+from datetime import datetime
+
 
 # Set the layout of the Streamlit
 st.set_page_config(layout="wide", page_icon=None, page_title="Counter Visualization")
@@ -23,39 +25,101 @@ st.image(image)
 st.header("This website is the new way to visualize data from your TR_J1 Reports!")
 
 # Upload file - of type csv, json, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
-file_upload = st.file_uploader("file upload", type=['csv', 'tsv', 'xlsx', 'json'], label_visibility="hidden", accept_multiple_files=True)
+file_upload = st.file_uploader("Please upload one unedited spreadsheet per year of data.", type=['csv', 'tsv', 'xlsx', 'json'], accept_multiple_files=True)
 
-# Create a variable to represent an empty Panda Dataframe
+# Create a variable to represent an empty Panda Dataframe, create an empty list to hold list of DataFrames
 df = pd.DataFrame()
+list_df = []
+file_names = []
+file_count = 0
 
 # Decision Tree to upload the files
+# for file in file_upload:
 if file_upload:
-    if file_upload.type == "text/csv":
-        df = pd.read_csv(file_upload, skiprows=13, index_col=False)
-    elif file_upload.type == "application/json":
-        json_temp = json.load(file_upload)
-        file_upload = json_temp["Report_Items"]
-        st.json(json_temp)
-        df = file_upload
-        #df = pd.read_json(file_upload)
-    elif file_upload.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": #xslx file
-        df = pd.read_excel(file_upload, skiprows=13)
-    elif file_upload.type == "text/tab-separated-values":
-        df = pd.read_csv(file_upload, sep='\t', skiprows=13)
-    else:
-        st.warning('Please upload a file of the correct type as listed above.', icon="⚠️")
-    st.success("File Uploaded!", icon="✅")
+    file_count = len(file_upload)
+    for file in file_upload:
+        if file.type == "text/csv":
+            df = pd.read_csv(file, skiprows=13, index_col=False)
+        elif file.type == "application/json":
+            json_temp = json.load(file)
+            file = json_temp["Report_Items"]
+            st.json(json_temp)
+            df = file
+            #df = pd.read_json(file)
+        elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": #xslx file
+            df = pd.read_excel(file, skiprows=13)
+        elif file.type == "text/tab-separated-values":
+            df = pd.read_csv(file, sep='\t', skiprows=13)
+        else:
+            st.warning('Warning: Please upload a file of the correct type as listed above.', icon="⚠️")
+        list_df.append(df)
+        file_names.append(file.name)
+
+    
+    # wording based on files uploaded
+    if len(file_upload) > 1:
+        st.success(str(len(file_upload)) + " files uploaded successfully!", icon="✅")
+    elif len(file_upload) ==  1:
+        st.success("File uploaded successfully!", icon="✅")
 else:
     df = pd.read_csv("Royal Society of Chemistry-TR_J1-2020 July-2022 June.csv", skiprows=13, index_col=False) # use default data
+    list_df.append(df)
+    file_names.append("Royal Society of Chemistry-TR_J1-2020 July-2022 June.csv")
 
 
 
 # cleaning data by dropping unecessary rows and coverting NaN types to 0
 df = df.drop(columns=["Publisher","Publisher_ID","Platform","DOI","Proprietary_ID","Print_ISSN","Online_ISSN","URI"])
-df.replace(np.nan, 0, regex=True, inplace = True)
+df.replace(np.nan, 1, regex=True, inplace = True)
 
+
+# Accurately gets all dates for each file and saves it to a dict 
+# key = name of file, val = list of dates
+df_dates = {}
+i = 0
+for given_df in list_df:
+    # st.write(given_df)
+    col_names = list(given_df.columns)[11:]
+    if len(col_names) < 12:
+        st.warning('Warning: Our records indicate that you have less than 12 months of data for one of your uploaded files.', icon="⚠️")
+    df_dates[file_names[i]] = col_names
+    i+=1
+
+# checks if files have data for the same month, can be updated to say which files possibly
+distinct_dates = []
+for file, date_range in df_dates.items():
+    for date in date_range:
+        # if (type(date) == datetime):
+        #     s = date.strftime("%Y, %m, %d, %H, %M")
+        #     print(s)
+        if date in distinct_dates:
+            st.error('Our records indicate that your two of your uploaded files have data for the same month. Please fix this error before moving forward.', icon="🚨")
+        else:
+            distinct_dates.append(date)
+
+st.write("#") # simple spacer
+# wording based on files uploaded
+if len(list_df) > 1:
+    st.subheader("You have successfully uploaded " + str(len(list_df)) + " files with the following dates ranges:")
+elif len(list_df) ==  1:
+    st.subheader("You have successfully uploaded a file with the following dates ranges:")
+
+unique_journals = []
+for given_df in list_df:
+    unique_journals.append(len(given_df.loc[given_df['Metric_Type'] == 'Unique_Item_Requests']))
+
+#listing dates based off either it is date time class or string
+i = 0
+for file, date_range in df_dates.items():
+    if type(date_range[0]) != datetime:
+        st.write(file + " has data from the dates " + date_range[0] + " to " + date_range[-1] + ". There are " + str(unique_journals[i]) + " journals with at least 1 use. Journals with no uses do no appear in TR_J1.")
+    else:
+        st.write(file + " has data from the dates " + date_range[0].strftime("%m/%Y") + " to " + date_range[-1].strftime("%m/%Y") + ". There are " + str(unique_journals[i]) + " journals with at least 1 use. Journals with no uses do no appear in TR_J1.")
 
 ############### Streamlit radio for Metric Type ##############
+st.write("#") # simple spacer
+st.markdown("Learn more about <a href='https://www.projectcounter.org/about/'>COUNTER</a>.", unsafe_allow_html=True)
+# https://medialibrary.projectcounter.org/file/The-Friendly-Guide-for-Librarians
 #Decision Tree for whether there exists more than one metric type on file
 if 'Unique_Item_Requests' in df['Metric_Type'].values and "Total_Item_Requests" in df['Metric_Type'].values:
     metric_choice = st.radio(
@@ -120,6 +184,7 @@ data = {
 
 # create a dataframe from the dicitionary created earlier so it could be later be dsiplayed or performed with other python functions 
 usage_df = pd.DataFrame(data)
+
 # determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
 max_count = usage_df["Number of Journals"].max()
 max_report = usage_df["Reporting Period Total"].max()
@@ -140,6 +205,8 @@ with st.expander("Expand to see the full list of titles associated with each req
     st.write("#") # spacing between text
     st.caption("Click on column title to order by ascending/descending order")
     st.dataframe(usage_df, use_container_width=True)
+    # st.markdown(usage_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
+
 
 #Responsible for the histogram based on Altair Vega Lite and St.altair_chart
 get_colors = lambda n: ["#%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
