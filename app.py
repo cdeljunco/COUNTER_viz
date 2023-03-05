@@ -58,14 +58,14 @@ if file_upload:
     
     # wording based on files uploaded
     if len(file_upload) > 1:
-        st.success(str(len(file_upload)) + " files uploaded successfully!", icon="✅")
+        st.success(str(file_count) + " files uploaded successfully!", icon="✅")
     elif len(file_upload) ==  1:
         st.success("File uploaded successfully!", icon="✅")
 else:
     df = pd.read_csv("Royal Society of Chemistry-TR_J1-2020 July-2022 June.csv", skiprows=13, index_col=False) # use default data
     list_df.append(df)
     file_names.append("Royal Society of Chemistry-TR_J1-2020 July-2022 June.csv")
-
+    file_count = len(list_df)
 
 
 # cleaning data by dropping unecessary rows and coverting NaN types to 0
@@ -89,32 +89,45 @@ for given_df in list_df:
 distinct_dates = []
 for file, date_range in df_dates.items():
     for date in date_range:
-        # if (type(date) == datetime):
-        #     s = date.strftime("%Y, %m, %d, %H, %M")
-        #     print(s)
         if date in distinct_dates:
             st.error('Our records indicate that your two of your uploaded files have data for the same month. Please fix this error before moving forward.', icon="🚨")
         else:
             distinct_dates.append(date)
 
 st.write("#") # simple spacer
-# wording based on files uploaded
-if len(list_df) > 1:
-    st.subheader("You have successfully uploaded " + str(len(list_df)) + " files with the following dates ranges:")
-elif len(list_df) ==  1:
-    st.subheader("You have successfully uploaded a file with the following dates ranges:")
 
+# wording based on number of files uploaded
+if len(list_df) > 1:
+    st.subheader("You have successfully uploaded " + str(len(list_df)) + " files with the following details:")
+elif len(list_df) ==  1:
+    st.subheader("You have successfully uploaded a file with the following details:")
+
+# Identify Unique Journals per TRJ1 file
 unique_journals = []
 for given_df in list_df:
     unique_journals.append(len(given_df.loc[given_df['Metric_Type'] == 'Unique_Item_Requests']))
 
 #listing dates based off either it is date time class or string
-i = 0
-for file, date_range in df_dates.items():
+date_col = []
+for date_range in df_dates.values():
     if type(date_range[0]) != datetime:
-        st.write(file + " has data from the dates " + date_range[0] + " to " + date_range[-1] + ". There are " + str(unique_journals[i]) + " journals with at least 1 use. Journals with no uses do no appear in TR_J1.")
+        date_col.append(date_range[0] + " - " + date_range[-1])
     else:
-        st.write(file + " has data from the dates " + date_range[0].strftime("%m/%Y") + " to " + date_range[-1].strftime("%m/%Y") + ". There are " + str(unique_journals[i]) + " journals with at least 1 use. Journals with no uses do no appear in TR_J1.")
+        date_col.append(date_range[0].strftime("%m/%Y") + " - " + date_range[-1].strftime("%m/%Y"))
+
+# saving file data into one hashmap
+file_data = {
+    "File Name": [file for file in df_dates],
+    "Date Range": [date for date in date_col], 
+    "Number of Journals": [num for num in unique_journals]
+}
+
+#creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
+with st.expander("Expand to see the full details of each uploaded file:", expanded=False):
+    #convert files' data into dataframe and display it, setting to max width
+    file_df = pd.DataFrame(file_data)
+    st.dataframe(file_df, use_container_width=True)
+
 
 ############### Streamlit radio for Metric Type ##############
 st.write("#") # simple spacer
