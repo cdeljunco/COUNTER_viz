@@ -70,6 +70,12 @@ else:
 
 # cleaning data by dropping unecessary rows and coverting NaN types to 0
 df = df.drop(columns=["Publisher","Publisher_ID","Platform","DOI","Proprietary_ID","Print_ISSN","Online_ISSN","URI"])
+for i, df_clean in enumerate(list_df):
+    df_clean = df_clean.drop(columns=["Publisher","Publisher_ID","Platform","DOI","Proprietary_ID","Print_ISSN","Online_ISSN","URI"])
+    df_clean.replace(df.replace(np.nan, 1, regex=True, inplace = True))
+    list_df[i] = df_clean
+    
+
 df.replace(np.nan, 1, regex=True, inplace = True)
 
 
@@ -78,7 +84,8 @@ df.replace(np.nan, 1, regex=True, inplace = True)
 df_dates = {}
 for i, given_df in enumerate(list_df):
     # st.write(given_df)
-    col_names = list(given_df.columns)[11:]
+    col_names = list(given_df.columns)[3:]
+
     if len(col_names) < 12:
         st.warning('Warning: Our records indicate that you have less than 12 months of data for one of your uploaded files.', icon="⚠️")
     df_dates[file_names[i]] = col_names
@@ -93,12 +100,15 @@ for file, date_range in df_dates.items():
             distinct_dates.append(date)
 
 st.write("#") # simple spacer
+st.write("#") # simple spacer
 
 # wording based on number of files uploaded
 if len(list_df) > 1:
     st.subheader("You have successfully uploaded " + str(len(list_df)) + " files with the following details:")
 elif len(list_df) ==  1:
     st.subheader("You have successfully uploaded a file with the following details:")
+
+st.write("#") # simple spacer
 
 # Identify Unique Journals per TRJ1 file
 unique_journals = []
@@ -150,13 +160,35 @@ elif 'Unique_Item_Requests' not in df['Metric_Type'].values and "Total_Item_Requ
 else:
     st.warning(st.warning('Please make sure that you have a valid metric type of Total Item Requests or Unique Item Requests', icon="⚠️"))
 
+# ## WILL BE REMOVED 
+# if metric_choice == "Unique Item Requests":
+#     df = df.loc[df['Metric_Type'] == "Unique_Item_Requests"]
+#     df = df.drop(columns="Metric_Type")
+# else:
+#     df = df.loc[df['Metric_Type'] == "Total_Item_Requests"]
+#     df = df.drop(columns="Metric_Type")
+##
 
+### TEST ###
 if metric_choice == "Unique Item Requests":
-    df = df.loc[df['Metric_Type'] == "Unique_Item_Requests"]
-    df = df.drop(columns="Metric_Type")
+    for i, df_choice in enumerate(list_df):
+        df_choice = df_choice.loc[df_choice['Metric_Type'] == "Unique_Item_Requests"]
+        df_choice = df_choice.drop(columns="Metric_Type")
+        list_df[i] = df_choice
+
 else:
-    df = df.loc[df['Metric_Type'] == "Total_Item_Requests"]
-    df = df.drop(columns="Metric_Type")
+    for i, df_choice in enumerate(list_df):
+        df_choice = df_choice.loc[df_choice['Metric_Type'] == "Total_Item_Requests"]
+        df_choice = df_choice.drop(columns="Metric_Type")
+        list_df[i] = df_choice
+
+# TABS TEST
+# st.write("#") # simple spacer
+# st.subheader("Click on a tab to see the details of each file")
+# tabs = st.tabs(date_col)
+# for i, df_t in enumerate(list_df):
+#     with tabs[i]:
+#         st.dataframe(df_t)
 ################ Determine the report total based on whether "Total Unqiue Item Requests" exist in the "Title" column
 
 # if df contains row for reporting period total, take that, else sum column
