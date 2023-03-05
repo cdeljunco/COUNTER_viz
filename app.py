@@ -76,14 +76,12 @@ df.replace(np.nan, 1, regex=True, inplace = True)
 # Accurately gets all dates for each file and saves it to a dict 
 # key = name of file, val = list of dates
 df_dates = {}
-i = 0
-for given_df in list_df:
+for i, given_df in enumerate(list_df):
     # st.write(given_df)
     col_names = list(given_df.columns)[11:]
     if len(col_names) < 12:
         st.warning('Warning: Our records indicate that you have less than 12 months of data for one of your uploaded files.', icon="⚠️")
     df_dates[file_names[i]] = col_names
-    i+=1
 
 # checks if files have data for the same month, can be updated to say which files possibly
 distinct_dates = []
