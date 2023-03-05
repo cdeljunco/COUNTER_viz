@@ -158,18 +158,9 @@ elif 'Unique_Item_Requests' not in df['Metric_Type'].values and "Total_Item_Requ
     ("Total Item Requests","Unique Item Requests"), disabled=True
     )
 else:
-    st.warning(st.warning('Please make sure that you have a valid metric type of Total Item Requests or Unique Item Requests', icon="⚠️"))
+    st.error(st.warning('Please make sure that you have a valid metric type of Total Item Requests or Unique Item Requests', icon="⚠️"))
 
-# ## WILL BE REMOVED 
-# if metric_choice == "Unique Item Requests":
-#     df = df.loc[df['Metric_Type'] == "Unique_Item_Requests"]
-#     df = df.drop(columns="Metric_Type")
-# else:
-#     df = df.loc[df['Metric_Type'] == "Total_Item_Requests"]
-#     df = df.drop(columns="Metric_Type")
-##
 
-### TEST ###
 if metric_choice == "Unique Item Requests":
     for i, df_choice in enumerate(list_df):
         df_choice = df_choice.loc[df_choice['Metric_Type'] == "Unique_Item_Requests"]
@@ -191,17 +182,20 @@ else:
 #         st.dataframe(df_t)
 ################ Determine the report total based on whether "Total Unqiue Item Requests" exist in the "Title" column
 
-# if df contains row for reporting period total, take that, else sum column
-if df.iat[len(df)-1, 0] == "Total unique item requests:":   # check if sum exists in file
-    rpt = df.iat[len(df) - 1, 1]
-    df = df.iloc[:len(df)-1]
-else:
-    rpt = df['Reporting_Period_Total'].sum()
+#sum reporting period total column
+rpt_list = []
+
+for df_rpt in list_df:
+    rpt = df_rpt['Reporting_Period_Total'].sum()
+    rpt_list.append(rpt)
 
 ############### Streamlit: Displaying Data #################
 
 # cost input, shows warning alert if no input, else success alert and display cost per report
-cost = st.number_input('Please input journal package cost in dollar amount:', min_value = 0.00, format="%f")
+st.write("#") # simple spacer
+cost_per_file = []
+for i, df in enumerate(list_df):
+    cost = st.number_input('Please input journal package cost for ' + file_names[i] + ' in dollar amount:', min_value = 0.00, format="%f", key=file_names[i])
 if not cost or cost < 0:
     st.warning("Please input a valid cost!", icon="⚠️")
 else:
