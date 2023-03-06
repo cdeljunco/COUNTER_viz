@@ -4,7 +4,8 @@
 # screens and components. Examples of widgets using this color are st.slider and st.checkbox.
 #primaryColor = "#919e8b" # green
 #primaryColor = "#2D9800"
-primaryColor = "#178582"
+#primaryColor = "#178582"
+primaryColor="#d92020"
 
 # Background color for the main container.
 #backgroundColor = "rgba(254,248,239,1)" # sepia yellow
@@ -14,7 +15,7 @@ primaryColor = "#178582"
 #backgroundColor = "#7570b3"
 #backgroundColor = "#D6D6D6"
 #backgroundColor="#0a1828"
-backgroundColor = "#0E2439"
+#backgroundColor = "#dbdbdb"
 
 # Used as the background for most widgets. Examples of widgets with this background are st.sidebar,
 # st.text_input, st.date_input.
@@ -22,15 +23,18 @@ backgroundColor = "#0E2439"
 #secondaryBackgroundColor = "#AA96DA"
 #secondaryBackgroundColor  = "#7570b3"
 #secondaryBackgroundColor = "#A2A2A2"
-secondaryBackgroundColor="#1a1a19"
+#secondaryBackgroundColor="#A0A0A0"
+secondaryBackgroundColor="#d92020"
 
 # Font color for the page.
 #textColor = "#0e0e0e" # grey
 #textColor = "#1b9e77"
 #textColor = "#187D5F"
 #textColor="#bfa181"
-textColor = "#FFCF96"
+#textColor = "#d92020"
+textColor="#000000"
 
 # Font family (serif | sans serif | mono) for the page. Will not impact code areas.
 # Default: "sans serif"
 font = "serif"
+

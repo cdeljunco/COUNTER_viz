@@ -213,14 +213,14 @@ for df in list_df:
 
     # create a dictionary that would contain the count numbers, the reporting total, and the titles of the journals
     data = {
-        "Reporting Period Total": [key for key, _ in occurrences.items()],
+        metric_choice: [key for key, _ in occurrences.items()],
         "Number of Journals with Same Item Requests": [val for _, val in occurrences.items()],
         "Titles (Double click to see full list)": [val for _, val in titles.items()]
     }
     usage_df = pd.DataFrame(data)
     occurrences_list.append(usage_df)
 st.write("#") # simple spacer
-st.subheader("Click on a tab to see the details of each file")
+st.subheader("Click on each tab to view the specific Fiscal Year")
 hist_tab = st.tabs(date_col)
 for i, df_t in enumerate(list_df):
     with hist_tab[i]:
@@ -228,7 +228,7 @@ for i, df_t in enumerate(list_df):
         # determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
         usage_df = occurrences_list[i]
         max_count = usage_df["Number of Journals with Same Item Requests"].max()
-        max_report = usage_df["Reporting Period Total"].max()
+        max_report = usage_df[metric_choice].max()
         chartHeight = 0
         #condition to determine the height for the histogram 
         if max_count >= 300:
