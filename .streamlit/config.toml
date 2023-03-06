@@ -24,8 +24,8 @@ primaryColor="#d92020"
 #secondaryBackgroundColor  = "#7570b3"
 #secondaryBackgroundColor = "#A2A2A2"
 #secondaryBackgroundColor="#A0A0A0"
-secondaryBackgroundColor="#d92020"
-
+#secondaryBackgroundColor="#d92020"
+secondaryBackgroundColor="#DF6464"
 # Font color for the page.
 #textColor = "#0e0e0e" # grey
 #textColor = "#1b9e77"
