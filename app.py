@@ -168,12 +168,12 @@ else:
         list_df[i] = df_choice
 
 # TABS TEST
-# st.write("#") # simple spacer
-# st.subheader("Click on a tab to see the details of each file")
-# tabs = st.tabs(date_col)
-# for i, df_t in enumerate(list_df):
-#     with tabs[i]:
-#         st.dataframe(df_t)
+st.write("#") # simple spacer
+st.subheader("Click on a tab to see the details of each file")
+tabs = st.tabs(date_col)
+for i, df_t in enumerate(list_df):
+    with tabs[i]:
+        st.dataframe(df_t)
 ################ Determine the report total based on whether "Total Unqiue Item Requests" exist in the "Title" column
 
 #sum reporting period total column
@@ -202,64 +202,62 @@ for i, val in enumerate(rpt_list):
 # using counter to get occurences of each num
 # TO DO: GATHER DATA PER DATAFRAME TO MAKE NEW USAGE DISTRIBUTION DATAFRAMES, MAKE TABS, MAKE CHARTS 
 
-# occurrences_list = []
-# titles_list = []
-# for df_file in list_df:
-#     occurrences = collections.Counter(df_file["Reporting_Period_Total"])
-#     titles = defaultdict(list)
-#     for index, row in df_file.iterrows():
-#         titles[row["Reporting_Period_Total"]].append(row['Title'])    
-occurrences = collections.Counter(df["Reporting_Period_Total"])
-titles = defaultdict(list)
-#There must be at least one journal linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
-for index, row in df.iterrows():
-    titles[row["Reporting_Period_Total"]].append(row['Title'])
+occurrences_list = []
+titles_list = []
+for df in list_df:
+    occurrences = collections.Counter(df["Reporting_Period_Total"])
+    titles = defaultdict(list)
+    #There must be at least one journal linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
+    for index, row in df.iterrows():
+        titles[row["Reporting_Period_Total"]].append(row['Title'])
 
-# create a dictionary that would contain the count numbers, the reporting total, and the titles of the journals
-data = {
-    "Reporting Period Total": [key for key, _ in occurrences.items()],
-    "Number of Journals": [val for _, val in occurrences.items()],
-    "Titles (Double click to see full list)": [val for _, val in titles.items()]
-}
-
-# create a dataframe from the dicitionary created earlier so it could be later be dsiplayed or performed with other python functions 
-usage_df = pd.DataFrame(data)
-
-# determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
-max_count = usage_df["Number of Journals"].max()
-max_report = usage_df["Reporting Period Total"].max()
-chartHeight = 0
-#condition to determine the height for the histogram 
-if max_count >= 300:
-    if max_count >= 300 & max_count <= 600:
-        chartHeight = 600
-    else:
-        chartHeight = max_count
-else:
-    chartHeight = 500
-
-
-st.subheader("Usage Distribution")
-#creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
-with st.expander("Expand to see the full list of titles associated with each request:", expanded=False):
-    st.write("#") # spacing between text
-    st.caption("Click on column title to order by ascending/descending order")
-    st.dataframe(usage_df, use_container_width=True)
-    # st.markdown(usage_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
-
-
-#Responsible for the histogram based on Altair Vega Lite and St.altair_chart
-get_colors = lambda n: ["#%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
-color_blind_friendly = ["#0077bb","#33bbee","#009988","#ee7733","#cc3311","#ee3377","#bbbbbb"]
-get_colors(50)
-stacked_df = df
-stacked_hist = alt.Chart(stacked_df).mark_bar(width=3).encode(
-    alt.X("Reporting_Period_Total:Q",scale = alt.Scale(domain=[0,max_report]),title="Reporting Period Total"),
-    alt.Y("count()",axis=alt.Axis(grid=False),title="Number of Journals"),
-    alt.Detail("Title"),
-    alt.Color("Title", legend = None, scale=alt.Scale(domain=[title for title in df["Title"]], range=color_blind_friendly)),
-    tooltip=["Title","Reporting_Period_Total"],
-).interactive().configure_view(height = chartHeight)
+    # create a dictionary that would contain the count numbers, the reporting total, and the titles of the journals
+    data = {
+        "Reporting Period Total": [key for key, _ in occurrences.items()],
+        "Number of Journals with Same Item Requests": [val for _, val in occurrences.items()],
+        "Titles (Double click to see full list)": [val for _, val in titles.items()]
+    }
+    usage_df = pd.DataFrame(data)
+    occurrences_list.append(usage_df)
 st.write("#") # simple spacer
-st.altair_chart(stacked_hist, use_container_width=True)
+st.subheader("Click on a tab to see the details of each file")
+hist_tab = st.tabs(date_col)
+for i, df_t in enumerate(list_df):
+    with hist_tab[i]:
+        # create a dataframe from the dicitionary created earlier so it could be later be dsiplayed or performed with other python functions 
+        # determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
+        usage_df = occurrences_list[i]
+        max_count = usage_df["Number of Journals with Same Item Requests"].max()
+        max_report = usage_df["Reporting Period Total"].max()
+        chartHeight = 0
+        #condition to determine the height for the histogram 
+        if max_count >= 300:
+            if max_count >= 300 & max_count <= 600:
+                chartHeight = 600
+            else:
+                chartHeight = max_count
+        else:
+            chartHeight = 500
+
+        st.subheader("Usage Distribution")
+        #creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
+        with st.expander("Expand to see the full list of titles associated with each request:", expanded=False):
+            st.write("#") # spacing between text
+            st.caption("Click on column title to order by ascending/descending order")
+            st.dataframe(usage_df, use_container_width=True)
+            # st.markdown(usage_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
+        #Responsible for the histogram based on Altair Vega Lite and St.altair_chart
+        get_colors = lambda n: ["#%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
+        color_blind_friendly = ["#0077bb","#33bbee","#009988","#ee7733","#cc3311","#ee3377","#bbbbbb"]
+        get_colors(50)
+        stacked_df = list_df[i]
+        stacked_hist = alt.Chart(stacked_df).mark_bar(width=3).encode(
+            alt.X("Reporting_Period_Total:Q",scale = alt.Scale(domain=[0,max_report]),title="Reporting Period Total"),
+            alt.Y("count()",axis=alt.Axis(grid=False),title="Number of Journals"),
+            alt.Detail("Title"),
+            alt.Color("Title", legend = None, scale=alt.Scale(domain=[title for title in df["Title"]], range=color_blind_friendly)),
+            tooltip=["Title","Reporting_Period_Total"],
+        ).interactive().configure_view(height = chartHeight)
+        st.write("#") # simple spacer
+        st.altair_chart(stacked_hist, use_container_width=True)
 st.markdown("<p style='text-align: center;'>Click on the three dots on the top right to download the chart as an SVG/PNG.</p>", unsafe_allow_html=True)
