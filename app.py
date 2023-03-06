@@ -24,8 +24,8 @@ image = Image.open('header.jfif')
 st.image(image)
 st.header("This website is the new way to visualize data from your TR_J1 Reports!")
 
-# Upload file - of type csv, json, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
-file_upload = st.file_uploader("Please upload one unedited spreadsheet per year of data.", type=['csv', 'tsv', 'xlsx', 'json'], accept_multiple_files=True)
+# Upload file - of type csv, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
+file_upload = st.file_uploader("Please upload one unedited spreadsheet per year of data.", type=['csv', 'tsv', 'xlsx'], accept_multiple_files=True)
 
 # Create a variable to represent an empty Panda Dataframe, create an empty list to hold list of DataFrames
 df = pd.DataFrame()
@@ -40,12 +40,6 @@ if file_upload:
     for file in file_upload:
         if file.type == "text/csv":
             df = pd.read_csv(file, skiprows=13, index_col=False)
-        elif file.type == "application/json":
-            json_temp = json.load(file)
-            file = json_temp["Report_Items"]
-            st.json(json_temp)
-            df = file
-            #df = pd.read_json(file)
         elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": #xslx file
             df = pd.read_excel(file, skiprows=13)
         elif file.type == "text/tab-separated-values":
@@ -84,7 +78,7 @@ df.replace(np.nan, 1, regex=True, inplace = True)
 df_dates = {}
 for i, given_df in enumerate(list_df):
     # st.write(given_df)
-    col_names = list(given_df.columns)[3:]
+    col_names = list(given_df.columns)[3:]      
 
     if len(col_names) < 12:
         st.warning('Warning: Our records indicate that you have less than 12 months of data for one of your uploaded files.', icon="⚠️")
@@ -189,25 +183,34 @@ for df_rpt in list_df:
     rpt = df_rpt['Reporting_Period_Total'].sum()
     rpt_list.append(rpt)
 
-############### Streamlit: Displaying Data #################
-
 # cost input, shows warning alert if no input, else success alert and display cost per report
 st.write("#") # simple spacer
 cost_per_file = []
 for i, df in enumerate(list_df):
     cost = st.number_input('Please input journal package cost for ' + file_names[i] + ' in dollar amount:', min_value = 0.00, format="%f", key=file_names[i])
-if not cost or cost < 0:
-    st.warning("Please input a valid cost!", icon="⚠️")
-else:
-    st.subheader("Based on your input, your total cost per use is calculated below")
-    cpt = format(cost/rpt, ".2f")
+    cost_per_file.append(cost)
+
+cpt_list = []
+st.subheader("Based on your input, your total cost per use is calculated below")
+for i, val in enumerate(rpt_list):
+    cpt = format(cost_per_file[i]/rpt_list[i], ".2f")
+    cpt_list.append(cpt)
     st.write("$ " + cpt)
 
 
+############### Streamlit: Displaying Data #################
 # using counter to get occurences of each num
+# TO DO: GATHER DATA PER DATAFRAME TO MAKE NEW USAGE DISTRIBUTION DATAFRAMES, MAKE TABS, MAKE CHARTS 
+
+# occurrences_list = []
+# titles_list = []
+# for df_file in list_df:
+#     occurrences = collections.Counter(df_file["Reporting_Period_Total"])
+#     titles = defaultdict(list)
+#     for index, row in df_file.iterrows():
+#         titles[row["Reporting_Period_Total"]].append(row['Title'])    
 occurrences = collections.Counter(df["Reporting_Period_Total"])
 titles = defaultdict(list)
-
 #There must be at least one journal linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
 for index, row in df.iterrows():
     titles[row["Reporting_Period_Total"]].append(row['Title'])
