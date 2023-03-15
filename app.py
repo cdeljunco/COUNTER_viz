@@ -3,12 +3,12 @@ import numpy as np
 import streamlit as st
 import altair as alt
 import streamlit.components.v1 as components
-import json
 import collections
 import random
 from collections import defaultdict
 from PIL import Image
 from datetime import datetime
+import os
 
 
 # Set the layout of the Streamlit
@@ -48,7 +48,6 @@ if file_upload:
             st.warning('Warning: Please upload a file of the correct type as listed above.', icon="⚠️")
         list_df.append(df)
         file_names.append(file.name)
-
     
     # wording based on files uploaded
     if len(file_upload) > 1:
@@ -56,9 +55,10 @@ if file_upload:
     elif len(file_upload) ==  1:
         st.success("File uploaded successfully!", icon="✅")
 else:
-    df = pd.read_csv("Royal Society of Chemistry-TR_J1-2020 July-2022 June.csv", skiprows=13, index_col=False) # use default data
-    list_df.append(df)
-    file_names.append("Royal Society of Chemistry-TR_J1-2020 July-2022 June.csv")
+    for file in os.listdir("./data"):
+        df = pd.read_excel("./data/" + file, skiprows=13, index_col=False) # use default data
+        list_df.append(df)
+        file_names.append(file)
     file_count = len(list_df)
 
 
@@ -102,7 +102,6 @@ if len(list_df) > 1:
 elif len(list_df) ==  1:
     st.subheader("You have successfully uploaded a file with the following details:")
 
-st.write("#") # simple spacer
 
 # Identify Unique Journals per TRJ1 file
 unique_journals = []
@@ -125,7 +124,7 @@ file_data = {
 }
 
 #creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
-with st.expander("Expand to see the full details of each uploaded file:", expanded=False):
+with st.expander("Expand to see the full details of each uploaded file:", expanded=True):
     #convert files' data into dataframe and display it, setting to max width
     file_df = pd.DataFrame(file_data)
     st.dataframe(file_df, use_container_width=True)
@@ -140,16 +139,6 @@ if 'Unique_Item_Requests' in df['Metric_Type'].values and "Total_Item_Requests" 
     metric_choice = st.radio(
     "Please select a Metric Type",
     ("Unique Item Requests","Total Item Requests")
-    )
-elif 'Unique_Item_Requests' in df['Metric_Type'].values and "Total_Item_Requests" not in df['Metric_Type'].values:
-    metric_choice = st.radio(
-    "Please select a Metric Type",
-    ("Unique Item Requests","Total Item Requests"), disabled=True
-    )
-elif 'Unique_Item_Requests' not in df['Metric_Type'].values and "Total_Item_Requests" in df['Metric_Type'].values:
-    metric_choice = st.radio(
-    "Please select a Metric Type",
-    ("Total Item Requests","Unique Item Requests"), disabled=True
     )
 else:
     st.error(st.warning('Please make sure that you have a valid metric type of Total Item Requests or Unique Item Requests', icon="⚠️"))
@@ -169,11 +158,12 @@ else:
 
 # TABS TEST
 st.write("#") # simple spacer
-st.subheader("Click on a tab to see the details of each file")
-tabs = st.tabs(date_col)
-for i, df_t in enumerate(list_df):
-    with tabs[i]:
-        st.dataframe(df_t)
+st.subheader("View More File Details")
+with st.expander("Expand to see the full details of each uploaded file:"):
+    tabs = st.tabs(date_col)
+    for i, df_t in enumerate(list_df):
+        with tabs[i]:
+            st.dataframe(df_t)
 ################ Determine the report total based on whether "Total Unqiue Item Requests" exist in the "Title" column
 
 #sum reporting period total column
@@ -185,6 +175,7 @@ for df_rpt in list_df:
 
 # cost input, shows warning alert if no input, else success alert and display cost per report
 st.write("#") # simple spacer
+st.header("Calculating Cost Per Use")
 cost_per_file = []
 for i, df in enumerate(list_df):
     cost = st.number_input('Please input journal package cost for ' + file_names[i] + ' in dollar amount:', min_value = 0.00, format="%f", key=file_names[i])
@@ -200,8 +191,6 @@ for i, val in enumerate(rpt_list):
 
 ############### Streamlit: Displaying Data #################
 # using counter to get occurences of each num
-# TO DO: GATHER DATA PER DATAFRAME TO MAKE NEW USAGE DISTRIBUTION DATAFRAMES, MAKE TABS, MAKE CHARTS 
-
 occurrences_list = []
 titles_list = []
 for df in list_df:
@@ -220,10 +209,12 @@ for df in list_df:
     usage_df = pd.DataFrame(data)
     occurrences_list.append(usage_df)
 st.write("#") # simple spacer
-st.subheader("Click on each tab to view the specific Fiscal Year")
+st.header("Usage Distribution")
+st.caption("Click on each tab to view the specific Fiscal Year")
 hist_tab = st.tabs(date_col)
 for i, df_t in enumerate(list_df):
     with hist_tab[i]:
+
         # create a dataframe from the dicitionary created earlier so it could be later be dsiplayed or performed with other python functions 
         # determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
         usage_df = occurrences_list[i]
@@ -239,7 +230,6 @@ for i, df_t in enumerate(list_df):
         else:
             chartHeight = 500
 
-        st.subheader("Usage Distribution")
         #creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
         with st.expander("Expand to see the full list of titles associated with each request:", expanded=False):
             st.write("#") # spacing between text
