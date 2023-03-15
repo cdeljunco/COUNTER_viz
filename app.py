@@ -186,7 +186,7 @@ st.subheader("Based on your input, your total cost per use is calculated below")
 for i, val in enumerate(rpt_list):
     cpt = format(cost_per_file[i]/rpt_list[i], ".2f")
     cpt_list.append(cpt)
-    st.write("$ " + cpt)
+    st.write("Price for " +  date_col[i] + ": $ " + cpt)
 
 
 ############### Streamlit: Displaying Data #################
