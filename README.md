@@ -3,6 +3,7 @@
 # COUNTER_viz
 
 ## About
+
 COUNTER_viz is a data visualization tool that enables libraries to upload TRJ1 files to get a sense of which journals are being utilized to make appropriate cost-benefit decisions. The application uses [Altair](https://altair-viz.github.io/index.html) to develop interactive graphs where the user can zoom and hover for the best user experience. The website was developed using [Streamlit](https://streamlit.io/), an open source app framework in Python language. 
 
 <br />
@@ -15,10 +16,11 @@ COUNTER_viz is a data visualization tool that enables libraries to upload TRJ1 f
 2. Install [PIP management system](https://pip.pypa.io/en/stable/installation/) (v22.3.1)
 
 ### File requirements
+
 1. Your TRJ1 file must be of type csv, tsv, or xlsx.
 2. It must remain unchanged after downloading it from your directory.
 
-# Run Streamlit App 
+# Run Streamlit App
 
 1. Clone the streamlit app to a directory of choice
 
@@ -33,4 +35,3 @@ streamlit run app.py
 ```
 
 :warning: **Make sure that you are running on Streamlit version 1.15.1 or later.**
-
