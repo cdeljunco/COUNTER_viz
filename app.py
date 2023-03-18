@@ -253,12 +253,12 @@ for i, df_t in enumerate(list_df):
         get_colors(50)
         stacked_df = list_df[i]
         stacked_hist = alt.Chart(stacked_df).mark_bar(width=3).encode(
-            alt.X("Reporting_Period_Total:Q",scale = alt.Scale(domain=[0,max_report]),title=metric_choice),
+            alt.X("Reporting_Period_Total:Q",scale = alt.Scale(domain=[0,max_report]),title="Reporting Period Total"),
             alt.Y("count()",axis=alt.Axis(grid=False),title="Number of Journals"),
             alt.Detail("Title"),
             alt.Color("Title", legend = None, scale=alt.Scale(domain=[title for title in df["Title"]], range=color_blind_friendly)),
-            tooltip=["Title",metric_choice],
-        ).interactive().configure_view(height = chartHeight)
+            tooltip=["Title","Reporting_Period_Total"],
+            ).interactive().configure_view(height = chartHeight)
         st.write("#") # simple spacer
         st.altair_chart(stacked_hist, use_container_width=True)
 st.markdown("Click on plot and scroll to zoom, click & drag to move, and double-click to reset view. Click ... at top right to download the chart as an SVG/PNG.", unsafe_allow_html=True)
