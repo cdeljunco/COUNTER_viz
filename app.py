@@ -149,7 +149,6 @@ with st.expander("Expand to see file details:", expanded=True):
     file_df = file_df.rename_axis("Row Index")
     st.dataframe(file_df, use_container_width=True)
 
-# TABS TEST
 st.write("#")  # simple spacer
 #st.subheader("View More File Details")
 with st.expander("Expand to see raw TR_J1 data:"):
@@ -287,4 +286,4 @@ for i, df_t in enumerate(list_df):
         ).interactive().configure_view(height=chartHeight)
         st.write("#")  # simple spacer
         st.altair_chart(stacked_hist, use_container_width=True)
-st.markdown("Click on plot and scroll to zoom, click & drag to move, and double-click to reset view. Click ... at top right to download the chart as an SVG/PNG.", unsafe_allow_html=True)
+st.write("Click on plot and scroll to zoom, click & drag to move, and double-click to reset view. Click ... at top right to download the chart as an SVG/PNG.")
