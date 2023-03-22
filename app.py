@@ -12,7 +12,7 @@ import os
 
 
 # Set the layout of the Streamlit
-st.set_page_config(layout="wide", page_icon=None,
+st.set_page_config(page_icon=None,
                    page_title="Counter Visualization")
 
 # primary_clr = st.get_option("theme.primaryColor")
@@ -20,9 +20,9 @@ st.set_page_config(layout="wide", page_icon=None,
 # # I want 3 colours to graph, so this is a red that matches the theme:
 # second_clr = "#d87c7c"
 
-# Main image and header
-image = Image.open('header.jfif')
-st.image(image)
+# Main image and header -- image will be removed
+# image = Image.open('header.jfif')
+# st.image(image)
 st.markdown("#### This app analyzes and plots TR_J1 journal usage data to allow you to easily assess the usage distribution, cost per use, and usage trends over time for your library's journal package subscriptions.")
 
 with st.expander("How to use:"):
@@ -47,11 +47,11 @@ file_count = 0
 if file_upload:
     file_count = len(file_upload)
     for file in file_upload:
-        if file.type == "text/csv":
+        if file.type == "text/csv":  #csv file
             df = pd.read_csv(file, skiprows=13, index_col=False)
         elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":  # xslx file
             df = pd.read_excel(file, skiprows=13)
-        elif file.type == "text/tab-separated-values":
+        elif file.type == "text/tab-separated-values":  # tsv file
             df = pd.read_csv(file, sep='\t', skiprows=13)
         else:
             st.warning(
