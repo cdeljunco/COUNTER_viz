@@ -9,12 +9,56 @@ from collections import defaultdict
 from PIL import Image
 from datetime import datetime
 import os
+import time
 
+# Create a variable to represent an empty Panda Dataframe, create an empty list to hold list of DataFrames
+df = pd.DataFrame()
+list_df = []
+file_names = []
+file_count = 0
 
 # Set the layout of the Streamlit
 st.set_page_config(page_icon=None,
                    page_title="Counter Visualization")
 
+# display sidebar
+with st.sidebar:
+    # Upload file - of type csv, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
+    file_upload = st.file_uploader("Drag & drop or browse files to upload one unmodified TR-J1 spreadsheet per fiscal year:",
+                                type=['csv', 'tsv', 'xlsx'], accept_multiple_files=True)
+    # Decision Tree to upload the files
+    if file_upload:
+        file_count = len(file_upload)
+        for file in file_upload:
+            if file.type == "text/csv":  #csv file
+                df = pd.read_csv(file, skiprows=13, index_col=False)
+            elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":  # xslx file
+                df = pd.read_excel(file, skiprows=13)
+            elif file.type == "text/tab-separated-values":  # tsv file
+                df = pd.read_csv(file, sep='\t', skiprows=13)
+            else:
+                st.warning(
+                    'Warning: Please upload a file of the correct type as listed above.', icon="⚠️")
+            list_df.append(df)
+            file_names.append(file.name)
+
+        # wording based on files uploaded
+        if len(file_upload) > 1:
+            st.success(str(file_count) + " files uploaded successfully!", icon="✅")
+        elif len(file_upload) == 1:
+            st.success("File uploaded successfully!", icon="✅")
+    else:
+        for file in os.listdir("./data"):
+            df = pd.read_excel("./data/" + file, skiprows=13,
+                            index_col=False)  # use default data
+            list_df.append(df)
+            file_names.append(file)
+        file_count = len(list_df)
+    
+    # add_selectbox = st.sidebar.selectbox(
+    #     "How would you like to be contacted?",
+    #     ("Email", "Home phone", "Mobile phone")
+    # )
 # primary_clr = st.get_option("theme.primaryColor")
 # txt_clr = st.get_option("theme.textColor")
 # # I want 3 colours to graph, so this is a red that matches the theme:
@@ -32,53 +76,12 @@ with st.expander("How to use:"):
     st.write(
         "This app was created by Rome Duong, Ricardo Zamora, and [Clara del Junco](https://cdeljunco.github.io/me/).")
 
-# Upload file - of type csv, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
-file_upload = st.file_uploader("Drag & drop or browse files to upload one unmodified TR-J1 spreadsheet per fiscal year:",
-                               type=['csv', 'tsv', 'xlsx'], accept_multiple_files=True)
-
-# Create a variable to represent an empty Panda Dataframe, create an empty list to hold list of DataFrames
-df = pd.DataFrame()
-list_df = []
-file_names = []
-file_count = 0
-
-# Decision Tree to upload the files
-# for file in file_upload:
-if file_upload:
-    file_count = len(file_upload)
-    for file in file_upload:
-        if file.type == "text/csv":  #csv file
-            df = pd.read_csv(file, skiprows=13, index_col=False)
-        elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":  # xslx file
-            df = pd.read_excel(file, skiprows=13)
-        elif file.type == "text/tab-separated-values":  # tsv file
-            df = pd.read_csv(file, sep='\t', skiprows=13)
-        else:
-            st.warning(
-                'Warning: Please upload a file of the correct type as listed above.', icon="⚠️")
-        list_df.append(df)
-        file_names.append(file.name)
-
-    # wording based on files uploaded
-    if len(file_upload) > 1:
-        st.success(str(file_count) + " files uploaded successfully!", icon="✅")
-    elif len(file_upload) == 1:
-        st.success("File uploaded successfully!", icon="✅")
-else:
-    for file in os.listdir("./data"):
-        df = pd.read_excel("./data/" + file, skiprows=13,
-                           index_col=False)  # use default data
-        list_df.append(df)
-        file_names.append(file)
-    file_count = len(list_df)
-
-
 # cleaning data by dropping unecessary rows and coverting NaN types to 0
 df = df.drop(columns=["Publisher", "Publisher_ID", "Platform",
              "DOI", "Proprietary_ID", "Print_ISSN", "Online_ISSN", "URI"])
 for i, df_clean in enumerate(list_df):
-    df_clean = df_clean.drop(columns=["Publisher", "Publisher_ID", "Platform",
-                             "DOI", "Proprietary_ID", "Print_ISSN", "Online_ISSN", "URI"])
+    df_clean.drop(columns=["Publisher", "Publisher_ID", "Platform",
+                             "DOI", "Proprietary_ID", "Print_ISSN", "Online_ISSN", "URI"], inplace=True)
     df_clean.replace(df.replace(np.nan, 1, regex=True, inplace=True))
     df_clean = df_clean.rename_axis("Row Index")
     list_df[i] = df_clean
@@ -197,21 +200,21 @@ for df_rpt in list_df:
     rpt_list.append(rpt)
 
 # cost input, shows warning alert if no input, else success alert and display cost per report
-st.write("#")  # simple spacer
-st.header("Cost Per Use")
-st.write('Input the journal package cost in dollars for the period covered by each TR_J1 file:',)
+st.sidebar.write("#")  # simple spacer
+st.sidebar.header("Cost Per Use")
+st.sidebar.write('Input the journal package cost in dollars for the period covered by each TR_J1 file:',)
 cost_per_file = []
 for i, df in enumerate(list_df):
-    cost = st.number_input(
+    cost = st.sidebar.number_input(
         ' ' + file_names[i] + ' ', min_value=0.00, format="%f", key=file_names[i])
     cost_per_file.append(cost)
 
 cpt_list = []
-st.subheader("Based on your input, the cost per use for...")
+st.sidebar.subheader("Based on your input, the cost per use for...")
 for i, val in enumerate(rpt_list):
     cpt = format(cost_per_file[i]/rpt_list[i], ".2f")
     cpt_list.append(cpt)
-    st.write(date_col[i] + " is : $ " + cpt)
+    st.sidebar.write(date_col[i] + " is : $ " + cpt)
 
 
 ############### Streamlit: Displaying Data #################
