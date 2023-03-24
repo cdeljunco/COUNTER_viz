@@ -283,8 +283,10 @@ for i, df_t in enumerate(list_df):
             alt.Y("count()", axis=alt.Axis(grid=False),
                   title="Number of Journals"),
             alt.Detail("Title"),
-            alt.Color("Title", legend=None, scale=alt.Scale(
-                domain=[title for title in df["Title"]], range=color_blind_friendly)),
+            #Creates the stacked histogram with which the colors are coded to be be color blind friendly 
+            #alt.Color("Title", legend=None, scale=alt.Scale(
+                #domain=[title for title in df["Title"]], range=color_blind_friendly)),
+
             tooltip=["Title", "Reporting_Period_Total"],
         ).interactive().configure_view(height=chartHeight)
         st.write("#")  # simple spacer
