@@ -23,6 +23,7 @@ st.set_page_config(page_icon=None,
 
 # display sidebar
 with st.sidebar:
+    st.subheader("The sidebar is resizable! Drag and drop the right border of the sidebar to resize it! ↔️")
     # Upload file - of type csv, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
     file_upload = st.file_uploader("Drag & drop or browse files to upload one unmodified TR-J1 spreadsheet per fiscal year:",
                                 type=['csv', 'tsv', 'xlsx'], accept_multiple_files=True)
@@ -220,13 +221,15 @@ for i, val in enumerate(rpt_list):
 ############### Streamlit: Displaying Data #################
 # using counter to get occurences of each num
 occurrences_list = []
-titles_list = []
+titles_set = set()
+
 for df in list_df:
     occurrences = collections.Counter(df["Reporting_Period_Total"])
     titles = defaultdict(list)
     # There must be at least one journal linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
     for index, row in df.iterrows():
         titles[row["Reporting_Period_Total"]].append(row['Title'])
+        titles_set.add(row['Title'])
 
     # create a dictionary that would contain the count numbers, the reporting total, and the titles of the journals
     count_header = "Number of journals with this many item requests"
@@ -238,6 +241,16 @@ for df in list_df:
     }
     usage_df = pd.DataFrame(data)
     occurrences_list.append(usage_df)
+
+st.sidebar.write("#") # simple spacer
+# multiselect option for titles
+titles_selected = st.sidebar.multiselect(
+    "Click on the titles you want to view on the chart",
+    titles_set
+) # contains a max selections param if we want the user to only select a limited amount
+
+
+# Usage Distribution - Tabs
 st.write("#")  # simple spacer
 st.header("Usage Distribution")
 st.write("See which journals were used the most and least for each of the time periods covered by your TR_J1 reports")
