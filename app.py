@@ -222,7 +222,9 @@ for i, val in enumerate(rpt_list):
 # using counter to get occurences of each num
 occurrences_list = []
 titles_set = set()
+max_df_values = []
 
+# loop through each dataframe in the list to create new dataframe
 for df in list_df:
     occurrences = collections.Counter(df["Reporting_Period_Total"])
     titles = defaultdict(list)
@@ -240,9 +242,11 @@ for df in list_df:
         title_header: [val for _, val in titles.items()]
     }
     usage_df = pd.DataFrame(data)
+    # max_df_values.append(usage_df[metric_choice].max())
     occurrences_list.append(usage_df)
 
 st.sidebar.write("#") # simple spacer
+
 # multiselect option for titles
 titles_selected = st.sidebar.multiselect(
     "Click on the titles you want to view on the chart",
@@ -264,8 +268,33 @@ for i, df_t in enumerate(list_df):
         usage_df = occurrences_list[i]
         usage_df = usage_df.rename_axis("Row Index")
         max_count = usage_df[count_header].max()
-        max_report = usage_df[metric_choice].max()
+        max_report = int(usage_df[metric_choice].max())
         chartHeight = 0
+        stacked_df = list_df[i]
+
+
+        # create a filter silder and use user input to create a filtered dataframe
+        filter_slider = st.slider("Set the minimum and maximum reporting period total (x-axis) here.", 1, max_report, value=(1,max_report)) # slider for user to check a varying range of reporting period totals
+        filter_min = filter_slider[0]
+        filter_max = filter_slider[1]
+        st.write(filter_slider) 
+        filter = stacked_df["Reporting_Period_Total"].between(filter_min, filter_max, "both") # returns whether element in Series is between 
+        filtered_df = stacked_df[filter]  # creates a filtered dataframe by only including elements that are true from filter variable
+        filter_count = len(filtered_df)
+
+        st.write(filter_count)
+
+        # wording based on range and journal count
+        if filter_max - filter_min >= 1 and filter_count > 1:
+            st.write("There are currently {} journals within the following range: {} - {} reporting period total.".format(filter_count, filter_min, filter_max))
+        elif filter_max - filter_min == 0 and filter_count > 1:
+            st.write("There are currently {} journals with {} reporting period total.".format(filter_count, filter_min))
+        elif filter_max - filter_min >= 1 and filter_count == 1:
+            st.write("There is currently {} journal within the following range: {} - {} reporting period total.".format(filter_count, filter_min, filter_max))
+        else:
+            st.write("There is currently {} journal with {} reporting period total.".format(filter_count, filter_min, filter_max))
+
+
         # condition to determine the height for the histogram
         if max_count >= 300:
             if max_count >= 300 & max_count <= 600:
@@ -276,21 +305,22 @@ for i, df_t in enumerate(list_df):
             chartHeight = 500
 
         # creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
-        with st.expander("Expand to see the data behind the distribution:", expanded=False):
+        with st.expander("Expand to see the filtered data behind the distribution:", expanded=False):
             st.write("#")  # spacing between text
             st.caption(
                 "Click on column header to sort by ascending/descending order")
-            st.dataframe(usage_df, use_container_width=True)
+            st.dataframe(filtered_df, use_container_width=True)
+            # st.dataframe(usage_df, use_container_width=True)
             # st.markdown(usage_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
-        # Responsible for the histogram based on Altair Vega Lite and St.altair_chart
 
+        # Responsible for the histogram based on Altair Vega Lite and St.altair_chart
         def get_colors(n): return ["#%06x" %
                                    random.randint(0, 0xFFFFFF) for _ in range(n)]
         color_blind_friendly = [
             "#0077bb", "#33bbee", "#009988", "#ee7733", "#cc3311", "#ee3377", "#bbbbbb"]
         get_colors(50)
-        stacked_df = list_df[i]
-        stacked_hist = alt.Chart(stacked_df).mark_bar(width=3).encode(
+
+        stacked_hist = alt.Chart(filtered_df).mark_bar(width=3).encode(
             alt.X("Reporting_Period_Total:Q", scale=alt.Scale(
                 domain=[0, max_report]), title="Reporting Period Total"),
             alt.Y("count()", axis=alt.Axis(grid=False),
