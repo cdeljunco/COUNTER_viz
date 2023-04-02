@@ -322,7 +322,7 @@ for i, df_t in enumerate(list_df):
 
         stacked_hist = alt.Chart(filtered_df).mark_bar(width=3).encode(
             alt.X("Reporting_Period_Total:Q", scale=alt.Scale(
-                domain=[0, max_report]), title="Reporting Period Total"),
+                domain=[0, filter_max]), title="Reporting Period Total"),
             alt.Y("count()", axis=alt.Axis(grid=False),
                   title="Number of Journals"),
             alt.Detail("Title"),
