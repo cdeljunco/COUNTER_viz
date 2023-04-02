@@ -3,6 +3,7 @@ import numpy as np
 import streamlit as st
 import altair as alt
 import streamlit.components.v1 as components
+import plotly.express as px
 import collections
 import random
 from collections import defaultdict
@@ -334,4 +335,41 @@ for i, df_t in enumerate(list_df):
         ).interactive().configure_view(height=chartHeight)
         st.write("#")  # simple spacer
         st.altair_chart(stacked_hist, use_container_width=True)
+
+#Create a bar chart showing the reporting period for specific journals
+st.header("Reporting Period Total over Time")
+
+bar_df = []
+#determine whether the user has selected any journal
+if titles_selected == []:
+    st.write("Please select journals on the left side")
+else:
+    for title in titles_selected:
+        bar_df.append(title)
+
+    #add a column of Fiscal Year to the dataframe corresponding to their fiscal year
+    for i in range(len(list_df)):
+        list_df[i] = list_df[i].iloc[:,[0,1]]
+        list_df[i]["Fiscal Year"] = date_col[i]
+
+    #create a new dataframe that bind all of the dataframes together
+    concat_df = pd.concat(list_df)
+    df = ""
+    if bar_df != "":
+        #create a dataframe that will only contain the titles of the journals that the user selected
+        df = concat_df[concat_df["Title"].isin(bar_df)]
+    st.dataframe(df, use_container_width=True)
+    
+    #convert the fiscal year column into a categorical variable
+    df['Fiscal Year'] = df['Fiscal Year'].astype('category')
+    #create a bar chart with the group colors based on the different fiscal years
+    fig = px.bar(df, x="Title", y="Reporting_Period_Total", color="Fiscal Year", barmode="group",color_discrete_sequence=['#D81B60', '#1E88E5', '#FFC107',"#004D40","#E48DF6","#FA01B8","#C16B04"],
+                labels={
+                    "Title": "Journal Title",
+                    "Reporting_Period_Total": "Reporting Period Total"
+                })
+
+    st.plotly_chart(fig)
+
+
 st.write("Click on plot and scroll to zoom, click & drag to move, and double-click to reset view. Click ... at top right to download the chart as an SVG/PNG.")
