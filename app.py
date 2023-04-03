@@ -323,6 +323,7 @@ else:
         df = trj1_list[i].dataframe
         df = df.iloc[:,[0,1]]
         df["Fiscal Year"] = date_col[i]
+        trj1_list[i].dataframe = df
 
     #create a new dataframe that bind all of the dataframes together
     concat_df = pd.concat([df.dataframe for df in trj1_list])
