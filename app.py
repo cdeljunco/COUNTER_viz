@@ -11,12 +11,13 @@ from PIL import Image
 from datetime import datetime
 import os
 import time
+from trj1 import TRJ1
 
 # Create a variable to represent an empty Panda Dataframe, create an empty list to hold list of DataFrames
 df = pd.DataFrame()
-list_df = []
-file_names = []
-file_count = 0
+trj1_list = []
+trj1_count = 0
+
 
 # Set the layout of the Streamlit
 st.set_page_config(page_icon=None,
@@ -31,6 +32,8 @@ with st.sidebar:
     # Decision Tree to upload the files
     if file_upload:
         file_count = len(file_upload)
+        trj1_count = len(file_upload)
+
         for file in file_upload:
             if file.type == "text/csv":  #csv file
                 df = pd.read_csv(file, skiprows=13, index_col=False)
@@ -41,8 +44,10 @@ with st.sidebar:
             else:
                 st.warning(
                     'Warning: Please upload a file of the correct type as listed above.', icon="⚠️")
-            list_df.append(df)
-            file_names.append(file.name)
+
+            trj1_file = TRJ1(file.name, df)
+            trj1_file.clean_dataframe()
+            trj1_list.append(trj1_file)
 
         # wording based on files uploaded
         if len(file_upload) > 1:
@@ -53,18 +58,13 @@ with st.sidebar:
         for file in os.listdir("./data"):
             df = pd.read_excel("./data/" + file, skiprows=13,
                             index_col=False)  # use default data
-            list_df.append(df)
-            file_names.append(file)
-        file_count = len(list_df)
-    
-    # add_selectbox = st.sidebar.selectbox(
-    #     "How would you like to be contacted?",
-    #     ("Email", "Home phone", "Mobile phone")
-    # )
-# primary_clr = st.get_option("theme.primaryColor")
-# txt_clr = st.get_option("theme.textColor")
-# # I want 3 colours to graph, so this is a red that matches the theme:
-# second_clr = "#d87c7c"
+
+            trj1_file = TRJ1(file, df)
+            trj1_file.clean_dataframe()
+            trj1_list.append(trj1_file)
+
+        trj1_count = len(trj1_list)
+
 
 # Main image and header -- image will be removed
 # image = Image.open('header.jfif')
@@ -78,70 +78,60 @@ with st.expander("How to use:"):
     st.write(
         "This app was created by Rome Duong, Ricardo Zamora, and [Clara del Junco](https://cdeljunco.github.io/me/).")
 
-# cleaning data by dropping unecessary rows and coverting NaN types to 0
-df = df.drop(columns=["Publisher", "Publisher_ID", "Platform",
-             "DOI", "Proprietary_ID", "Print_ISSN", "Online_ISSN", "URI"])
-for i, df_clean in enumerate(list_df):
-    df_clean.drop(columns=["Publisher", "Publisher_ID", "Platform",
-                             "DOI", "Proprietary_ID", "Print_ISSN", "Online_ISSN", "URI"], inplace=True)
-    df_clean.replace(df.replace(np.nan, 1, regex=True, inplace=True))
-    df_clean = df_clean.rename_axis("Row Index")
-    list_df[i] = df_clean
-
-
-df.replace(np.nan, 1, regex=True, inplace=True)
+# if there exists a file with < 12 months of data, send warning
+for trj1_file in trj1_list:
+    if not trj1_file.is_Full_FY():
+        # st.write(trj1_file.name)  # can use this variable to identify which exact file
+        st.warning('Warning: One of your files contains less than 12 months of data. Keep \
+                   this in mind when calculating cost per use and comparing usage between \
+                   years.', icon="⚠️")
 
 
 # Accurately gets all dates for each file and saves it to a dict
 # key = name of file, val = list of dates
 df_dates = {}
-for i, given_df in enumerate(list_df):
-    # st.write(given_df)
-    col_names = list(given_df.columns)[3:]
 
-    if len(col_names) < 12:
-        st.warning('Warning: One of your files contains less than 12 months of data. Keep this in mind when calculating cost per use and comparing usage between years.', icon="⚠️")
-    df_dates[file_names[i]] = col_names
+for trj1_file in trj1_list:
+    df_dates[trj1_file.name] = trj1_file.get_header_dates()
 
 # checks if files have data for the same month, can be updated to say which files possibly
-distinct_dates = []
-for file, date_range in df_dates.items():
-    for date in date_range:
-        if date in distinct_dates:
-            st.warning('Warning: Two or more of your files contain data for the same month. To compare data across time periods, please upload non-ovelapping TR_J1 reports.', icon="⚠️")
+all_dates = []
+dates_set = set()
 
-        else:
-            distinct_dates.append(date)
+for trj1_file in trj1_list:
+    all_dates.extend(trj1_file.get_header_dates())
+    file_date_set = set(trj1_file.get_header_dates())
+    dates_set = dates_set.union(file_date_set)
+    
+if len(dates_set) != len(all_dates):
+    st.warning('Warning: Two or more of your files contain data for the same month. To compare data across time periods, please upload non-ovelapping TR_J1 reports.', icon="⚠️")
 
 st.write("#")  # simple spacer
 st.write("#")  # simple spacer
 
 # wording based on number of files uploaded
-if len(list_df) > 1:
+if trj1_count > 1:
     st.subheader("You have successfully uploaded " +
-                 str(len(list_df)) + " files with the following details:")
-elif len(list_df) == 1:
+                 str(trj1_count) + " files with the following details:")
+elif trj1_count == 1:
     st.subheader(
         "You have successfully uploaded a file with the following details:")
 
 
 # Identify Unique Journals per TRJ1 file
 unique_journals = []
-for given_df in list_df:
+for trj1 in trj1_list:
     unique_journals.append(
-        len(given_df.loc[given_df['Metric_Type'] == 'Unique_Item_Requests']))
+            len(trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == 'Unique_Item_Requests']))
 
 # listing dates based off either it is date time class or string
 date_col = []
 for date_range in df_dates.values():
-    if type(date_range[0]) != datetime:
-        date_col.append(date_range[0] + " - " + date_range[-1])
-    else:
-        date_col.append(date_range[0].strftime(
-            "%m/%Y") + " - " + date_range[-1].strftime("%m/%Y"))
+    date_col.append(date_range[0].strftime(
+        "%m/%Y") + " - " + date_range[-1].strftime("%m/%Y"))
 
 # saving file data into one hashmap
-file_data = {
+file_details = {
     "File Name": [file for file in df_dates],
     "Date Range": [date for date in date_col],
     "Number of Journals": [num for num in unique_journals]
@@ -150,17 +140,17 @@ file_data = {
 # creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
 with st.expander("Expand to see file details:", expanded=True):
     # convert files' data into dataframe and display it, setting to max width
-    file_df = pd.DataFrame(file_data)
-    file_df = file_df.rename_axis("Row Index")
-    st.dataframe(file_df, use_container_width=True)
+    file_details_df = pd.DataFrame(file_details)
+    file_details_df = file_details_df.rename_axis("Row Index")
+    st.dataframe(file_details_df, use_container_width=True)
 
 st.write("#")  # simple spacer
 #st.subheader("View More File Details")
 with st.expander("Expand to see raw TR_J1 data:"):
     tabs = st.tabs(date_col)
-    for i, df_t in enumerate(list_df):
+    for i, trj1 in enumerate(trj1_list):
         with tabs[i]:
-            st.dataframe(df_t)
+            st.dataframe(trj1.dataframe)
 
 
 ############### Streamlit radio for Metric Type ##############
@@ -177,46 +167,25 @@ else:
     st.error(st.warning(
         'Please make sure that you have a valid metric type of Total Item Requests or Unique Item Requests', icon="⚠️"))
 
+for trj1 in trj1_list:
+    if metric_choice == "Unique Item Requests":
+        trj1.dataframe = trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == "Unique_Item_Requests"]
+    else:
+        trj1.dataframe = trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == "Total_Item_Requests"]
+    trj1.dataframe.drop(columns = "Metric_Type", inplace = True)
+    trj1.set_reporting_period_total()
 
-if metric_choice == "Unique Item Requests":
-    for i, df_choice in enumerate(list_df):
-        df_choice = df_choice.loc[df_choice['Metric_Type']
-                                  == "Unique_Item_Requests"]
-        df_choice = df_choice.drop(columns="Metric_Type")
-        list_df[i] = df_choice
-
-else:
-    for i, df_choice in enumerate(list_df):
-        df_choice = df_choice.loc[df_choice['Metric_Type']
-                                  == "Total_Item_Requests"]
-        df_choice = df_choice.drop(columns="Metric_Type")
-        list_df[i] = df_choice
-
-# Determine the report total based on whether "Total Unique Item Requests" exist in the "Title" column
-
-# sum reporting period total column
-rpt_list = []
-
-for df_rpt in list_df:
-    rpt = df_rpt['Reporting_Period_Total'].sum()
-    rpt_list.append(rpt)
-
-# cost input, shows warning alert if no input, else success alert and display cost per report
 st.sidebar.write("#")  # simple spacer
 st.sidebar.header("Cost Per Use")
-st.sidebar.write('Input the journal package cost in dollars for the period covered by each TR_J1 file:',)
-cost_per_file = []
-for i, df in enumerate(list_df):
-    cost = st.sidebar.number_input(
-        ' ' + file_names[i] + ' ', min_value=0.00, format="%f", key=file_names[i])
-    cost_per_file.append(cost)
+st.sidebar.write('Input the journal package cost in dollars for the period covered by each TR_J1 file:')
+for trj1 in trj1_list:
+    cost = st.sidebar.number_input(' ' + trj1.name + ' ', min_value=0.00, format="%f", key=trj1.name)
+    trj1.set_cost_per_use(cost)
 
-cpt_list = []
 st.sidebar.subheader("Based on your input, the cost per use for...")
-for i, val in enumerate(rpt_list):
-    cpt = format(cost_per_file[i]/rpt_list[i], ".2f")
-    cpt_list.append(cpt)
-    st.sidebar.write(date_col[i] + " is : $ " + cpt)
+
+for i, trj1 in enumerate(trj1_list):    
+    st.sidebar.write(date_col[i] + " is : $ " + format(trj1.cpu, ".2f"))
 
 
 ############### Streamlit: Displaying Data #################
@@ -226,7 +195,8 @@ titles_set = set()
 max_df_values = []
 
 # loop through each dataframe in the list to create new dataframe
-for df in list_df:
+for trj1 in trj1_list:
+    df = trj1.dataframe
     occurrences = collections.Counter(df["Reporting_Period_Total"])
     titles = defaultdict(list)
     # There must be at least one journal linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
@@ -258,12 +228,12 @@ titles_selected = st.sidebar.multiselect(
 # Usage Distribution - Tabs
 st.write("#")  # simple spacer
 st.header("Usage Distribution")
-st.write("See which journals were used the most and least for each of the time periods covered by your TR_J1 reports")
+st.write("See which journals were used the most and least for each \
+         of the time periods covered by your TR_J1 reports")
 #st.caption("Click on each tab to view the specific Fiscal Year")
 hist_tab = st.tabs(date_col)
-for i, df_t in enumerate(list_df):
+for i, trj1 in enumerate(trj1_list):
     with hist_tab[i]:
-
         # create a dataframe from the dictionary created earlier so it could be later be dsiplayed or performed with other python functions
         # determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
         usage_df = occurrences_list[i]
@@ -271,11 +241,13 @@ for i, df_t in enumerate(list_df):
         max_count = usage_df[count_header].max()
         max_report = int(usage_df[metric_choice].max())
         chartHeight = 0
-        stacked_df = list_df[i]
+        stacked_df = trj1.dataframe
 
 
         # create a filter silder and use user input to create a filtered dataframe
-        filter_slider = st.slider("Set the minimum and maximum reporting period total (x-axis) here.", 1, max_report, value=(1,max_report)) # slider for user to check a varying range of reporting period totals
+        filter_slider = st.slider("Set the minimum and maximum reporting period total (x-axis) here.",
+                                   1, max_report, 
+                                   value=(1,max_report)) # slider for user to check a varying range of reporting period totals
         filter_min = filter_slider[0]
         filter_max = filter_slider[1]
         st.write(filter_slider) 
@@ -312,7 +284,6 @@ for i, df_t in enumerate(list_df):
                 "Click on column header to sort by ascending/descending order")
             st.dataframe(filtered_df, use_container_width=True)
             # st.dataframe(usage_df, use_container_width=True)
-            # st.markdown(usage_df.style.hide(axis="index").to_html(), unsafe_allow_html=True)
 
         # Responsible for the histogram based on Altair Vega Lite and St.altair_chart
         def get_colors(n): return ["#%06x" %
@@ -348,12 +319,13 @@ else:
         bar_df.append(title)
 
     #add a column of Fiscal Year to the dataframe corresponding to their fiscal year
-    for i in range(len(list_df)):
-        list_df[i] = list_df[i].iloc[:,[0,1]]
-        list_df[i]["Fiscal Year"] = date_col[i]
+    for i in range(len(trj1_list)):
+        df = trj1_list[i].dataframe
+        df = df.iloc[:,[0,1]]
+        df["Fiscal Year"] = date_col[i]
 
     #create a new dataframe that bind all of the dataframes together
-    concat_df = pd.concat(list_df)
+    concat_df = pd.concat([df.dataframe for df in trj1_list])
     df = ""
     if bar_df != "":
         #create a dataframe that will only contain the titles of the journals that the user selected
