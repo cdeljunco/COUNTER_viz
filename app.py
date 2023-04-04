@@ -13,25 +13,28 @@ import os
 import time
 from trj1 import TRJ1
 
-# Create a variable to represent an empty Panda Dataframe, create an empty list to hold list of DataFrames
+# Empty Panda Dataframe that stores a read TRJ1 File
 df = pd.DataFrame()
+
+# Empty List that holds TRJ1 Objects
 trj1_list = []
+
+# Saves the count of total TRJ1 Objects
 trj1_count = 0
 
 
 # Set the layout of the Streamlit
-st.set_page_config(page_icon=None,
-                   page_title="Counter Visualization")
+st.set_page_config(page_icon=None, page_title="Counter Visualization")
 
 # display sidebar
 with st.sidebar:
     st.subheader("The sidebar is resizable! Drag and drop the right border of the sidebar to resize it! ↔️")
     # Upload file - of type csv, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
     file_upload = st.file_uploader("Drag & drop or browse files to upload one unmodified TR-J1 spreadsheet per fiscal year:",
-                                type=['csv', 'tsv', 'xlsx'], accept_multiple_files=True)
+                                        type=['csv', 'tsv', 'xlsx'], 
+                                        accept_multiple_files=True)
     # Decision Tree to upload the files
     if file_upload:
-        file_count = len(file_upload)
         trj1_count = len(file_upload)
 
         for file in file_upload:
@@ -42,17 +45,17 @@ with st.sidebar:
             elif file.type == "text/tab-separated-values":  # tsv file
                 df = pd.read_csv(file, sep='\t', skiprows=13)
             else:
-                st.warning(
-                    'Warning: Please upload a file of the correct type as listed above.', icon="⚠️")
+                st.warning('Warning: Please upload a file of the correct type as listed above.', 
+                                icon="⚠️")
 
             trj1_file = TRJ1(file.name, df)
             trj1_file.clean_dataframe()
             trj1_list.append(trj1_file)
 
         # wording based on files uploaded
-        if len(file_upload) > 1:
-            st.success(str(file_count) + " files uploaded successfully!", icon="✅")
-        elif len(file_upload) == 1:
+        if trj1_count > 1:
+            st.success(str(trj1_count) + " files uploaded successfully!", icon="✅")
+        elif trj1_count == 1:
             st.success("File uploaded successfully!", icon="✅")
     else:
         for file in os.listdir("./data"):
@@ -69,7 +72,9 @@ with st.sidebar:
 # Main image and header -- image will be removed
 # image = Image.open('header.jfif')
 # st.image(image)
-st.markdown("#### This app analyzes and plots TR_J1 journal usage data to allow you to easily assess the usage distribution, cost per use, and usage trends over time for your library's journal package subscriptions.")
+st.markdown("#### This app analyzes and plots TR_J1 journal usage data to allow you \
+            to easily assess the usage distribution, cost per use, and usage trends \
+            over time for your library's journal package subscriptions.")
 
 with st.expander("How to use:"):
     st.write("This app takes COUNTER 5 TR_J1 reports and subscription costs for a journal package and calculates the cost per use and journal usage distribution for the time periods covered by the TR-J1 reports. TR-J1 reports contain two usage metrics: Total_Item_Requests and Unique_Item_Requests. Most librarians use the Total_Item_Requests metric to evaluate usage, because it doesn't count repeat views and downloads of an item by the same user.")
@@ -83,8 +88,8 @@ for trj1_file in trj1_list:
     if not trj1_file.is_Full_FY():
         # st.write(trj1_file.name)  # can use this variable to identify which exact file
         st.warning('Warning: One of your files contains less than 12 months of data. Keep \
-                   this in mind when calculating cost per use and comparing usage between \
-                   years.', icon="⚠️")
+                        this in mind when calculating cost per use and comparing usage between \
+                        years.', icon="⚠️") # might give us multiple warnings
 
 
 # Accurately gets all dates for each file and saves it to a dict
@@ -104,7 +109,9 @@ for trj1_file in trj1_list:
     dates_set = dates_set.union(file_date_set)
     
 if len(dates_set) != len(all_dates):
-    st.warning('Warning: Two or more of your files contain data for the same month. To compare data across time periods, please upload non-ovelapping TR_J1 reports.', icon="⚠️")
+    st.warning('Warning: Two or more of your files contain data for the same month. \
+                To compare data across time periods, please upload non-ovelapping TR_J1 reports.',
+                icon="⚠️")
 
 st.write("#")  # simple spacer
 st.write("#")  # simple spacer
@@ -112,23 +119,23 @@ st.write("#")  # simple spacer
 # wording based on number of files uploaded
 if trj1_count > 1:
     st.subheader("You have successfully uploaded " +
-                 str(trj1_count) + " files with the following details:")
+                str(trj1_count) + " files with the following details:")
 elif trj1_count == 1:
     st.subheader(
         "You have successfully uploaded a file with the following details:")
 
 
-# Identify Unique Journals per TRJ1 file
+# Identify Unique Journals per TRJ1 file by counting len of unique item requests 
 unique_journals = []
 for trj1 in trj1_list:
     unique_journals.append(
-            len(trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == 'Unique_Item_Requests']))
+            len(trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == 'Unique_Item_Requests'])
+            )
 
 # listing dates based off either it is date time class or string
 date_col = []
 for date_range in df_dates.values():
-    date_col.append(date_range[0].strftime(
-        "%m/%Y") + " - " + date_range[-1].strftime("%m/%Y"))
+    date_col.append(date_range[0].strftime("%m/%Y") + " - " + date_range[-1].strftime("%m/%Y"))
 
 # saving file data into one hashmap
 file_details = {
@@ -145,7 +152,7 @@ with st.expander("Expand to see file details:", expanded=True):
     st.dataframe(file_details_df, use_container_width=True)
 
 st.write("#")  # simple spacer
-#st.subheader("View More File Details")
+# display tabs of dataframes in expander
 with st.expander("Expand to see raw TR_J1 data:"):
     tabs = st.tabs(date_col)
     for i, trj1 in enumerate(trj1_list):
@@ -157,7 +164,7 @@ with st.expander("Expand to see raw TR_J1 data:"):
 st.write("#")  # simple spacer
 #st.markdown("Learn more about <a href='https://www.projectcounter.org/about/'>COUNTER</a>.", unsafe_allow_html=True)
 # https://medialibrary.projectcounter.org/file/The-Friendly-Guide-for-Librarians
-# Decision Tree for whether there exists more than one metric type on file
+# Decision Tree to verify that both metric types exist in trj1 files
 if 'Unique_Item_Requests' in df['Metric_Type'].values and "Total_Item_Requests" in df['Metric_Type'].values:
     metric_choice = st.radio(
         "Select which metric type to use:",
@@ -166,7 +173,7 @@ if 'Unique_Item_Requests' in df['Metric_Type'].values and "Total_Item_Requests" 
 else:
     st.error(st.warning(
         'Please make sure that you have a valid metric type of Total Item Requests or Unique Item Requests', icon="⚠️"))
-
+# only include rows for specified metric choice
 for trj1 in trj1_list:
     if metric_choice == "Unique Item Requests":
         trj1.dataframe = trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == "Unique_Item_Requests"]
@@ -175,6 +182,7 @@ for trj1 in trj1_list:
     trj1.dataframe.drop(columns = "Metric_Type", inplace = True)
     trj1.set_reporting_period_total()
 
+# sidebar (Cost Per Use: Input and Output)
 st.sidebar.write("#")  # simple spacer
 st.sidebar.header("Cost Per Use")
 st.sidebar.write('Input the journal package cost in dollars for the period covered by each TR_J1 file:')
@@ -217,10 +225,10 @@ for trj1 in trj1_list:
     occurrences_list.append(usage_df)
 
 st.sidebar.write("#") # simple spacer
-
+st.sidebar.header("Reporting Period Total Over Time: Journal Selection")
 # multiselect option for titles
 titles_selected = st.sidebar.multiselect(
-    "Click on the titles you want to view on the chart",
+    "Search and click on the titles you want to view in the bar chart",
     titles_set
 ) # contains a max selections param if we want the user to only select a limited amount
 
@@ -246,16 +254,13 @@ for i, trj1 in enumerate(trj1_list):
 
         # create a filter silder and use user input to create a filtered dataframe
         filter_slider = st.slider("Set the minimum and maximum reporting period total (x-axis) here.",
-                                   1, max_report, 
-                                   value=(1,max_report)) # slider for user to check a varying range of reporting period totals
+                                    1, max_report, 
+                                    value=(1,max_report)) # slider for user to check a varying range of reporting period totals
         filter_min = filter_slider[0]
         filter_max = filter_slider[1]
-        st.write(filter_slider) 
         filter = stacked_df["Reporting_Period_Total"].between(filter_min, filter_max, "both") # returns whether element in Series is between 
         filtered_df = stacked_df[filter]  # creates a filtered dataframe by only including elements that are true from filter variable
         filter_count = len(filtered_df)
-
-        st.write(filter_count)
 
         # wording based on range and journal count
         if filter_max - filter_min >= 1 and filter_count > 1:
@@ -266,7 +271,6 @@ for i, trj1 in enumerate(trj1_list):
             st.write("There is currently {} journal within the following range: {} - {} reporting period total.".format(filter_count, filter_min, filter_max))
         else:
             st.write("There is currently {} journal with {} reporting period total.".format(filter_count, filter_min, filter_max))
-
 
         # condition to determine the height for the histogram
         if max_count >= 300:
@@ -307,13 +311,17 @@ for i, trj1 in enumerate(trj1_list):
         st.write("#")  # simple spacer
         st.altair_chart(stacked_hist, use_container_width=True)
 
+st.write("Click on plot and scroll to zoom, click & drag to move, \
+            and double-click to reset view. Click ... at top right \
+            to download the chart as an SVG/PNG.")
+
 #Create a bar chart showing the reporting period for specific journals
 st.header("Reporting Period Total over Time")
 
 bar_df = []
 #determine whether the user has selected any journal
 if titles_selected == []:
-    st.write("Please select journals on the left side")
+    st.warning("To view journals over time, please select journals on the left sidebar")
 else:
     for title in titles_selected:
         bar_df.append(title)
@@ -336,13 +344,15 @@ else:
     #convert the fiscal year column into a categorical variable
     df['Fiscal Year'] = df['Fiscal Year'].astype('category')
     #create a bar chart with the group colors based on the different fiscal years
-    fig = px.bar(df, x="Title", y="Reporting_Period_Total", color="Fiscal Year", barmode="group",color_discrete_sequence=['#D81B60', '#1E88E5', '#FFC107',"#004D40","#E48DF6","#FA01B8","#C16B04"],
+    fig = px.bar(df, 
+                x="Title", 
+                y="Reporting_Period_Total", 
+                color="Fiscal Year", 
+                barmode="group",
+                color_discrete_sequence=['#D81B60', '#1E88E5', '#FFC107',"#004D40","#E48DF6","#FA01B8","#C16B04"],
                 labels={
                     "Title": "Journal Title",
                     "Reporting_Period_Total": "Reporting Period Total"
                 })
-
     st.plotly_chart(fig)
-
-
-st.write("Click on plot and scroll to zoom, click & drag to move, and double-click to reset view. Click ... at top right to download the chart as an SVG/PNG.")
+    st.write("Please keep in mind that perhaps not all journals may be present in every file, therefore certain journals may not have a full collection of bars in the graph above.")
