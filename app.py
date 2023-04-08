@@ -12,6 +12,7 @@ from datetime import datetime
 import os
 import time
 from trj1 import TRJ1
+from streamlit.runtime.uploaded_file_manager import UploadedFile
 
 # Empty Panda Dataframe that stores a read TRJ1 File
 df = pd.DataFrame()
@@ -22,9 +23,23 @@ trj1_list = []
 # Saves the count of total TRJ1 Objects
 trj1_count = 0
 
-
 # Set the layout of the Streamlit
 st.set_page_config(page_icon=None, page_title="Counter Visualization")
+
+# Function to read file based on type
+def read_file(file: UploadedFile) -> pd.DataFrame:
+    if file.type == "text/csv":  #csv file
+        df = pd.read_csv(file, skiprows=13, index_col=False)
+    elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":  # xslx file
+        df = pd.read_excel(file, skiprows=13)
+    elif file.type == "text/tab-separated-values":  # tsv file
+        df = pd.read_csv(file, sep='\t', skiprows=13)
+    else:
+        st.warning('Warning: Please upload a file of the correct type as listed above.', 
+                        icon="⚠️")
+        df = None
+    return df
+
 
 # display sidebar
 with st.sidebar:
@@ -38,16 +53,7 @@ with st.sidebar:
         trj1_count = len(file_upload)
 
         for file in file_upload:
-            if file.type == "text/csv":  #csv file
-                df = pd.read_csv(file, skiprows=13, index_col=False)
-            elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":  # xslx file
-                df = pd.read_excel(file, skiprows=13)
-            elif file.type == "text/tab-separated-values":  # tsv file
-                df = pd.read_csv(file, sep='\t', skiprows=13)
-            else:
-                st.warning('Warning: Please upload a file of the correct type as listed above.', 
-                                icon="⚠️")
-
+            df = read_file(file)
             trj1_file = TRJ1(file.name, df)
             trj1_file.clean_dataframe()
             trj1_list.append(trj1_file)
@@ -59,8 +65,9 @@ with st.sidebar:
             st.success("File uploaded successfully!", icon="✅")
     else:
         for file in os.listdir("./data"):
-            df = pd.read_excel("./data/" + file, skiprows=13,
-                            index_col=False)  # use default data
+            df = pd.read_excel("./data/" + file, 
+                                    skiprows=13,
+                                    index_col=False)  # use default data
 
             trj1_file = TRJ1(file, df)
             trj1_file.clean_dataframe()

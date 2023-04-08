@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 import numpy as np
+from typing import List
 
 class TRJ1:
     """
@@ -84,7 +85,7 @@ class TRJ1:
         self.dataframe.replace(np.nan, 1, regex=True, inplace=True)
         self.dataframe = self.dataframe.rename_axis("Row Index")
     
-    def get_header_dates(self) -> list[datetime]:
+    def get_header_dates(self) -> List[datetime]:
         date_range = []
         for header in self.dataframe.columns.values:
             if type(header) == datetime:
