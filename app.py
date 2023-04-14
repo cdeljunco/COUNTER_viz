@@ -13,7 +13,10 @@ import os
 import time
 from trj1 import TRJ1
 from streamlit.runtime.uploaded_file_manager import UploadedFile
+import inflect 
 
+# intitializes inflect class for grammar
+p = inflect.engine()
 # Empty Panda Dataframe that stores a read TRJ1 File
 df = pd.DataFrame()
 
@@ -40,6 +43,16 @@ def read_file(file: UploadedFile) -> pd.DataFrame:
         df = None
     return df
 
+def read_default_files():
+    for file in os.listdir("./data"):
+        df = pd.read_excel("./data/" + file, 
+                                skiprows=13,
+                                index_col=False)  # use default data
+
+        trj1_file = TRJ1(file, df)
+        trj1_file.clean_dataframe()
+        # st.write(trj1_file.dataframe)
+        trj1_list.append(trj1_file)
 
 # display sidebar
 with st.sidebar:
@@ -50,31 +63,19 @@ with st.sidebar:
                                         accept_multiple_files=True)
     # Decision Tree to upload the files
     if file_upload:
-        trj1_count = len(file_upload)
-
         for file in file_upload:
             df = read_file(file)
             trj1_file = TRJ1(file.name, df)
             trj1_file.clean_dataframe()
             trj1_list.append(trj1_file)
 
-        # wording based on files uploaded
-        if trj1_count > 1:
-            st.success(str(trj1_count) + " files uploaded successfully!", icon="✅")
-        elif trj1_count == 1:
-            st.success("File uploaded successfully!", icon="✅")
+        # displays files uploaded successfully using inflect module
+        st.success(p.no("file", len(file_upload)) + " uploaded successfully!", icon="✅")
     else:
-        for file in os.listdir("./data"):
-            df = pd.read_excel("./data/" + file, 
-                                    skiprows=13,
-                                    index_col=False)  # use default data
+        read_default_files()
 
-            trj1_file = TRJ1(file, df)
-            trj1_file.clean_dataframe()
-            trj1_list.append(trj1_file)
-
-        trj1_count = len(trj1_list)
-
+trj1_count = len(trj1_list)
+df = trj1_list[0].dataframe
 
 # Main image and header -- image will be removed
 # image = Image.open('header.jfif')
@@ -123,14 +124,8 @@ if len(dates_set) != len(all_dates):
 st.write("#")  # simple spacer
 st.write("#")  # simple spacer
 
-# wording based on number of files uploaded
-if trj1_count > 1:
-    st.subheader("You have successfully uploaded " +
-                str(trj1_count) + " files with the following details:")
-elif trj1_count == 1:
-    st.subheader(
-        "You have successfully uploaded a file with the following details:")
-
+# displays count of files uploaded using inflect module
+st.subheader("You have successfully uploaded " + p.no("file", trj1_count) + " with the following details: ")
 
 # Identify Unique Journals per TRJ1 file by counting len of unique item requests 
 unique_journals = []
@@ -265,19 +260,16 @@ for i, trj1 in enumerate(trj1_list):
                                     value=(1,max_report)) # slider for user to check a varying range of reporting period totals
         filter_min = filter_slider[0]
         filter_max = filter_slider[1]
+        filter_diff = filter_max - filter_min
         filter = stacked_df["Reporting_Period_Total"].between(filter_min, filter_max, "both") # returns whether element in Series is between 
         filtered_df = stacked_df[filter]  # creates a filtered dataframe by only including elements that are true from filter variable
         filter_count = len(filtered_df)
 
-        # wording based on range and journal count
-        if filter_max - filter_min >= 1 and filter_count > 1:
-            st.write("There are currently {} journals within the following range: {} - {} reporting period total.".format(filter_count, filter_min, filter_max))
-        elif filter_max - filter_min == 0 and filter_count > 1:
-            st.write("There are currently {} journals with {} reporting period total.".format(filter_count, filter_min))
-        elif filter_max - filter_min >= 1 and filter_count == 1:
-            st.write("There is currently {} journal within the following range: {} - {} reporting period total.".format(filter_count, filter_min, filter_max))
+        # grammar based on filter slider using inflect
+        if filter_diff:
+            st.write("There " + p.plural("is", filter_count) + " currently " + p.no("journal", filter_count) + " within the following range: {} - {} reporting period total".format(filter_min, filter_max))
         else:
-            st.write("There is currently {} journal with {} reporting period total.".format(filter_count, filter_min, filter_max))
+            st.write("There " + p.plural("is", filter_count) + " currently " + p.no("journal", filter_count) + " with {} reporting period total".format(filter_min))
 
         # condition to determine the height for the histogram
         if max_count >= 300:
@@ -298,7 +290,7 @@ for i, trj1 in enumerate(trj1_list):
 
         # Responsible for the histogram based on Altair Vega Lite and St.altair_chart
         def get_colors(n): return ["#%06x" %
-                                   random.randint(0, 0xFFFFFF) for _ in range(n)]
+                                    random.randint(0, 0xFFFFFF) for _ in range(n)]
         color_blind_friendly = [
             "#0077bb", "#33bbee", "#009988", "#ee7733", "#cc3311", "#ee3377", "#bbbbbb"]
         get_colors(50)
@@ -306,8 +298,9 @@ for i, trj1 in enumerate(trj1_list):
         stacked_hist = alt.Chart(filtered_df).mark_bar(width=3).encode(
             alt.X("Reporting_Period_Total:Q", scale=alt.Scale(
                 domain=[0, filter_max]), title="Reporting Period Total"),
-            alt.Y("count()", axis=alt.Axis(grid=False),
-                  title="Number of Journals"),
+            alt.Y("count()", 
+                    axis=alt.Axis(grid=False),
+                    title="Number of Journals"),
             alt.Detail("Title"),
             #Creates the stacked histogram with which the colors are coded to be be color blind friendly 
             #alt.Color("Title", legend=None, scale=alt.Scale(
