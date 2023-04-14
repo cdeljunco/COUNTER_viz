@@ -40,10 +40,14 @@ def read_file(file: UploadedFile) -> pd.DataFrame:
     else:
         st.warning('Warning: Please upload a file of the correct type as listed above.', 
                         icon="⚠️")
-        df = None
+        
+    trj1_file = TRJ1(file.name, df)
+    trj1_file.clean_dataframe()
+    trj1_list.append(trj1_file)
+
     return df
 
-def read_default_files():
+def read_default_files() -> pd.DataFrame:
     for file in os.listdir("./data"):
         df = pd.read_excel("./data/" + file, 
                                 skiprows=13,
@@ -51,8 +55,9 @@ def read_default_files():
 
         trj1_file = TRJ1(file, df)
         trj1_file.clean_dataframe()
-        # st.write(trj1_file.dataframe)
         trj1_list.append(trj1_file)
+        
+    return df
 
 # display sidebar
 with st.sidebar:
@@ -65,17 +70,13 @@ with st.sidebar:
     if file_upload:
         for file in file_upload:
             df = read_file(file)
-            trj1_file = TRJ1(file.name, df)
-            trj1_file.clean_dataframe()
-            trj1_list.append(trj1_file)
 
         # displays files uploaded successfully using inflect module
         st.success(p.no("file", len(file_upload)) + " uploaded successfully!", icon="✅")
     else:
-        read_default_files()
+        df = read_default_files()
 
 trj1_count = len(trj1_list)
-df = trj1_list[0].dataframe
 
 # Main image and header -- image will be removed
 # image = Image.open('header.jfif')
@@ -319,13 +320,12 @@ st.write("Click on plot and scroll to zoom, click & drag to move, \
 st.header("Reporting Period Total over Time")
 
 bar_df = []
+bar_df.extend(titles_selected)
+
 #determine whether the user has selected any journal
-if titles_selected == []:
+if not titles_selected:
     st.warning("To view journals over time, please select journals on the left sidebar")
 else:
-    for title in titles_selected:
-        bar_df.append(title)
-
     #add a column of Fiscal Year to the dataframe corresponding to their fiscal year
     for i in range(len(trj1_list)):
         df = trj1_list[i].dataframe
