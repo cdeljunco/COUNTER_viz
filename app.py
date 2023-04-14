@@ -14,6 +14,7 @@ import time
 from trj1 import TRJ1
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 import inflect 
+from typing import List
 
 # intitializes inflect class for grammar
 p = inflect.engine()
@@ -58,6 +59,17 @@ def read_default_files() -> pd.DataFrame:
         trj1_list.append(trj1_file)
         
     return df
+
+def update_metric_choice(trj1_list: List[TRJ1], metric_choice: str):
+    metric_trj1_list = trj1_list
+    for trj1 in metric_trj1_list:
+        if metric_choice == "Unique Item Requests":
+            trj1.dataframe = trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == "Unique_Item_Requests"]
+        else:
+            trj1.dataframe = trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == "Total_Item_Requests"]
+        trj1.dataframe.drop(columns = "Metric_Type", inplace = True)
+        trj1.set_reporting_period_total()
+    return metric_trj1_list
 
 # display sidebar
 with st.sidebar:
@@ -177,13 +189,7 @@ else:
     st.error(st.warning(
         'Please make sure that you have a valid metric type of Total Item Requests or Unique Item Requests', icon="⚠️"))
 # only include rows for specified metric choice
-for trj1 in trj1_list:
-    if metric_choice == "Unique Item Requests":
-        trj1.dataframe = trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == "Unique_Item_Requests"]
-    else:
-        trj1.dataframe = trj1.dataframe.loc[trj1.dataframe['Metric_Type'] == "Total_Item_Requests"]
-    trj1.dataframe.drop(columns = "Metric_Type", inplace = True)
-    trj1.set_reporting_period_total()
+trj1_list = update_metric_choice(trj1_list, metric_choice)
 
 # sidebar (Cost Per Use: Input and Output)
 st.sidebar.write("#")  # simple spacer
@@ -226,14 +232,6 @@ for trj1 in trj1_list:
     usage_df = pd.DataFrame(data)
     # max_df_values.append(usage_df[metric_choice].max())
     occurrences_list.append(usage_df)
-
-st.sidebar.write("#") # simple spacer
-st.sidebar.header("Reporting Period Total Over Time: Journal Selection")
-# multiselect option for titles
-titles_selected = st.sidebar.multiselect(
-    "Search and click on the titles you want to view in the bar chart",
-    titles_set
-) # contains a max selections param if we want the user to only select a limited amount
 
 
 # Usage Distribution - Tabs
@@ -318,6 +316,11 @@ st.write("Click on plot and scroll to zoom, click & drag to move, \
 
 #Create a bar chart showing the reporting period for specific journals
 st.header("Reporting Period Total over Time")
+# multiselect option for titles
+titles_selected = st.multiselect(
+    "Search and click on the titles you want to view in the bar chart.",
+    titles_set
+) # contains a max selections param if we want the user to only select a limited amount
 
 bar_df = []
 bar_df.extend(titles_selected)
