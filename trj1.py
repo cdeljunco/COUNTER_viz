@@ -54,29 +54,36 @@ class TRJ1:
         str_data = self.name + list_data
         return str_data
     
+    # Sets start date by iterating through headers and finding first datetime value
     def set_start_date(self) -> None:
         for header in self.dataframe.columns.values:
             if type(header) == datetime:
                 self.start_date = header
                 break
+
+    # Sets end date by finding the last datetime header
     def set_end_date(self) -> None:
         for header in self.dataframe.columns.values:
             if type(header) == datetime:
                 self.end_date = header
 
+    # Sets rpt by summing the 'Reporting Period Total' column
     def set_reporting_period_total(self) -> None:
         self.rpt = self.dataframe['Reporting_Period_Total'].sum()
     
+    # Sets cost per use given cost as a parameter
     def set_cost_per_use(self, cost) -> None:
         self.cpu = float(cost / self.rpt)
 
+    # Determines whether file is a full Fiscal Year by subtracting start and end date
     def is_Full_FY(self) -> bool:
         diff = self.end_date - self.start_date # -> timedelta type
         if diff.days >= 335:
             return True
         else:
             return False
-        
+    
+    # Removes all unwanted columns that will not be used at all
     def clean_dataframe(self) -> None:
         self.set_start_date()
         self.set_end_date()
@@ -85,6 +92,7 @@ class TRJ1:
         self.dataframe.replace(np.nan, 1, regex=True, inplace=True)
         self.dataframe = self.dataframe.rename_axis("Row Index")
     
+    # Returns all dates as a list of datetime values
     def get_header_dates(self) -> List[datetime]:
         date_range = []
         for header in self.dataframe.columns.values:
