@@ -15,6 +15,7 @@ from trj1 import TRJ1
 from streamlit.runtime.uploaded_file_manager import UploadedFile
 import inflect
 from typing import List
+from figures import *
 
 # intitializes inflect class for grammar
 p = inflect.engine()
@@ -246,20 +247,10 @@ for trj1 in trj1_list:
     # max_df_values.append(usage_df[metric_choice].max())
     occurrences_list.append(usage_df)
 
-# Cost per use line graph for all of the attached journals
-st.header("Cost Per Use Distribution")
-cpuData = {
-    "Date Range": date_col,
-    "Cost Per Use": cpuDF
-}
-# create a dataframe from the given data range and the CPU per fiscal year
-cpuDataFrame = pd.DataFrame(cpuData)
-# st.write(cpuDataFrame)
-
-fig1 = px.line(cpuDataFrame,
-               x="Date Range",
-               y="Cost Per Use")
-fig1.update_layout(yaxis=dict(range=[0, max(cpuDataFrame["Cost Per Use"])+1]))
+# Create Line plot of Distribution of Cost Per Use
+st.header("Distribution of Cost Per Use")
+fig1 = linePlot(date_col, cpuDF)[0]
+fig1.update_layout(yaxis=dict(range=[0, max(linePlot(date_col, cpuDF)[1]["Cost Per Use"])+1]))
 st.plotly_chart(fig1)
 
 
@@ -317,28 +308,8 @@ for i, trj1 in enumerate(trj1_list):
             st.caption(
                 "Click on column header to sort by ascending/descending order")
             st.dataframe(filtered_df, use_container_width=True)
-            # st.dataframe(usage_df, use_container_width=True)
 
-        # Responsible for the histogram based on Altair Vega Lite and St.altair_chart
-        def get_colors(n): return ["#%06x" %
-                                   random.randint(0, 0xFFFFFF) for _ in range(n)]
-        color_blind_friendly = [
-            "#0077bb", "#33bbee", "#009988", "#ee7733", "#cc3311", "#ee3377", "#bbbbbb"]
-        get_colors(50)
-
-        stacked_hist = alt.Chart(filtered_df).mark_bar(width=3).encode(
-            alt.X("Reporting_Period_Total:Q", scale=alt.Scale(
-                domain=[0, filter_max]), title="Reporting Period Total"),
-            alt.Y("count()",
-                  axis=alt.Axis(grid=False),
-                  title="Number of Journals"),
-            alt.Detail("Title"),
-            # Creates the stacked histogram with which the colors are coded to be be color blind friendly
-            # alt.Color("Title", legend=None, scale=alt.Scale(
-            # domain=[title for title in df["Title"]], range=color_blind_friendly)),
-
-            tooltip=["Title", "Reporting_Period_Total"],
-        ).interactive().configure_view(height=chartHeight)
+        stacked_hist = histogram(filtered_df, filter_max, chartHeight)
         st.write("#")  # simple spacer
         st.altair_chart(stacked_hist, use_container_width=True)
 
@@ -379,17 +350,7 @@ else:
 
     # convert the fiscal year column into a categorical variable
     df['Fiscal Year'] = df['Fiscal Year'].astype('category')
-    # create a bar chart with the group colors based on the different fiscal years
-    fig = px.bar(df,
-                 x="Title",
-                 y="Reporting_Period_Total",
-                 color="Fiscal Year",
-                 barmode="group",
-                 color_discrete_sequence=[
-                     '#D81B60', '#1E88E5', '#FFC107', "#004D40", "#E48DF6", "#FA01B8", "#C16B04"],
-                 labels={
-                     "Title": "Journal Title",
-                     "Reporting_Period_Total": "Reporting Period Total"
-                 })
+    #create a Plotly barchart
+    fig = barChart(df)
     st.plotly_chart(fig)
     st.write("Please keep in mind that perhaps not all journals may be present in every file, therefore certain journals may not have a full collection of bars in the graph above.")
