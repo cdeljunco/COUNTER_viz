@@ -56,32 +56,15 @@ with st.expander("How to use:"):
     st.write(
         "To learn more about COUNTER 5 and TR_J1 metrics, visit: [the COUNTER website](https://www.projectcounter.org) or the [guide for librarians](https://www.projectcounter.org/wp-content/uploads/2018/03/Release5_Librarians_PDFX_20180307.pdf).")
     st.write(
-        "This app was created by Rome Duong, Ricardo Zamora, and [Clara del Junco](https://cdeljunco.github.io/me/).")
+        "This app was created by [Rome Duong](https://www.linkedin.com/in/phearom-d-503862195/), [Ricardo Zamora](https://www.linkedin.com/in/zamora-ricardo/), and [Clara del Junco](https://cdeljunco.github.io/me/).")
 
-# if there exists a file with < 12 months of data, send warning
-for trj1_file in trj1_list:
-    if not trj1_file.is_Full_FY():
-        # st.write(trj1_file.name)  # can use this variable to identify which exact file
-        st.warning('Warning: One of your files contains less than 12 months of data. Keep \
-                        this in mind when calculating cost per use and comparing usage between \
-                        years.', icon="⚠️")  # might give us multiple warnings
-
+check_fiscal_year(trj1_list)
+check_duplicate_dates(trj1_list)
 
 # Accurately gets all dates for each file and saves it to a dict using dict comprehension
 # key = name of file, val = list of dates
 df_dates = {trj1.name: trj1.get_header_dates() for trj1 in trj1_list}
 
-# checks if files have data for the same month, can be updated to say which files possibly
-all_dates = []
-dates_set = set()
-
-all_dates = [date for trj1_file in trj1_list for date in trj1_file.get_header_dates()]
-dates_set = set(all_dates)
-
-if len(dates_set) != len(all_dates):
-    st.warning('Warning: Two or more of your files contain data for the same month. \
-                To compare data across time periods, please upload non-ovelapping TR_J1 reports.',
-                icon="⚠️")
 
 st.write("#")  # simple spacer
 st.write("#")  # simple spacer
@@ -179,14 +162,19 @@ dfs = [trj1.dataframe for trj1 in trj1_list]
 for df in dfs:
     # Count the number of occurrences of each value in the metric_choice column
     occurrences = df[metric_choice].value_counts().sort_index()
+
     # Group the data by the values in the metric_choice column
     grouped_data = df.groupby(metric_choice)
+
     # Apply a lambda function to each group to create a list of titles
     titles_list = grouped_data.apply(lambda x: x['Title'].tolist())
+
     # Combine the occurrences and titles_list into a single DataFrame
     usage_df = pd.concat([occurrences, titles_list], axis=1).reset_index()
+
     # Rename columns
     usage_df.columns = [metric_choice, count_header, title_header]
+
     # Store the titles in a defaultdict
     for index, row in usage_df.iterrows():
         titles[row[metric_choice]].extend(row[title_header])
@@ -223,7 +211,7 @@ else:
             max_count = usage_df[count_header].max()
 
             # create a filter slider and use user input to create a filtered dataframe
-            filter_slider = st.slider("Set the minimum and maximum reporting period total (x-axis) here.", 1, max_reports[i], value=(1, max_reports[i]))
+            filter_slider = st.slider("Set the minimum and maximum reporting period total (x-axis) here.", 1, max_reports[i], value=(1, max_reports[i]), key=i)
             filter_min = filter_slider[0]
             filter_max = filter_slider[1]
             filtered_df = trj1.dataframe.query('Reporting_Period_Total >= @filter_min and Reporting_Period_Total <= @filter_max')
