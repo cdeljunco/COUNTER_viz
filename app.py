@@ -200,7 +200,7 @@ if date_col and 0 not in cpuDF:
     fig1.update_layout(yaxis=dict(range=[0, max(linePlot(date_col, cpuDF)[1]["Cost Per Use"])+1]))
     st.plotly_chart(fig1)
 else:
-    st.write("Please provide input for Cost Per Use")
+    st.warning("Please provide input for Cost Per Use in the sidebar")
 
 
 # Usage Distribution - Tabs
@@ -216,7 +216,6 @@ else:
     # precompute max_report across all dataframes
     max_reports = [int(occurrences[metric_choice].max()) for occurrences in occurrences_list]
     # precompute the plural version of 'journal' for efficiency
-    plural_journals = p.plural("journal", 2)
     for i, trj1 in enumerate(trj1_list):
         with hist_tab[i]:
             # get the dataframe from the list created earlier so it can be displayed
@@ -225,12 +224,22 @@ else:
 
             # create a filter slider and use user input to create a filtered dataframe
             filter_slider = st.slider("Set the minimum and maximum reporting period total (x-axis) here.", 1, max_reports[i], value=(1, max_reports[i]))
-            filtered_df = trj1.dataframe.query('Reporting_Period_Total >= @filter_slider[0] and Reporting_Period_Total <= @filter_slider[1]')
+            filter_min = filter_slider[0]
+            filter_max = filter_slider[1]
+            filtered_df = trj1.dataframe.query('Reporting_Period_Total >= @filter_min and Reporting_Period_Total <= @filter_max')
 
             # display number of filtered journals
+            filter_diff = filter_max - filter_min
             filter_count = len(filtered_df)
-            filter_range = f"{filter_slider[0]} - {filter_slider[1]}" if filter_slider[0] != filter_slider[1] else f"{filter_slider[0]}"
-            st.write(f"There {'is' if filter_count == 1 else 'are'} currently {p.no(plural_journals, filter_count)} within the following range: {filter_range} reporting period total")
+            
+            # grammar based on filter slider using inflect
+            if filter_diff:
+                st.write("There " + p.plural("is", filter_count) + " currently " + p.no("journal", filter_count) +
+                        " within the following range: {} - {} reporting period total.".format(filter_min, filter_max))
+            else:
+                st.write("There " + p.plural("is", filter_count) + " currently " + p.no(
+                    "journal", filter_count) + " with a {} reporting period total.".format(filter_min))
+
 
             # determine the height for the histogram based on the maximum count
             chart_height = 600 if 300 <= max_count <= 600 else max_count if max_count < 300 else 500
@@ -279,8 +288,9 @@ else:
         st.warning("Please select at least one title to view journals over time.")
 
 complete_trj1_list, incomplete_trj1 = set_complete_incomplete_files(trj1_list)
-projection = project_total_uses(complete_trj1_list, incomplete_trj1)
-st.write(projection)
+for incomplete in incomplete_trj1:
+    projection = project_total_uses(complete_trj1_list, incomplete)
+    st.write(projection)
 # st.write([trj1.rpt for trj1 in trj1_list])
-remaining_months = calculate_remaining_months(incomplete_trj1)
+# remaining_months = calculate_remaining_months(incomplete_trj1)
 # st.write(remaining_months)

@@ -3,19 +3,22 @@
 
 from datetime import datetime
 import pandas as pd
-import streamlit as st
+from typing import List
+from trj1 import TRJ1
 
 # Identify complete files and the single incomplete trj1
-def set_complete_incomplete_files(trj1_list):
+def set_complete_incomplete_files(trj1_list: List[TRJ1]):
     # List TRJ1 with full Fiscal Year
     complete_trj1_list = []
+    
+    # List TRJ1 with incomplete Fiscal Year
+    incomplete_trj1 = []
 
     for trj1 in trj1_list:
         if trj1.is_Full_FY():
             complete_trj1_list.append(trj1)
         else:
-            # TRJ1 with incomplete Fiscal Year
-            incomplete_trj1 = trj1
+            incomplete_trj1.append(trj1)
 
     return (complete_trj1_list, incomplete_trj1)
 
