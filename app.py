@@ -3,11 +3,10 @@ import streamlit as st
 import collections
 from collections import defaultdict
 import os
-from trj1 import TRJ1
-from streamlit.runtime.uploaded_file_manager import UploadedFile
 import inflect
 from typing import List
 from figures import *
+from helper_fxns import *
 
 # intitializes inflect class for grammar
 p = inflect.engine()
@@ -23,47 +22,6 @@ trj1_count = 0
 # Set the layout of the Streamlit
 st.set_page_config(page_icon=None, page_title="Counter Visualization")
 
-# Function to read file based on type
-def read_file(file: UploadedFile) -> pd.DataFrame:
-    read_func = None
-    if file.type == "text/csv":  # csv file
-        read_func = pd.read_csv
-    elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":  # xslx file
-        read_func = pd.read_excel
-    elif file.type == "text/tab-separated-values":  # tsv file
-        read_func = lambda f, **kwargs: pd.read_csv(f, sep='\t', **kwargs)
-    
-    if not read_func:
-        st.warning('Warning: Please upload a file of the correct type as listed above.', icon="⚠️")
-        return pd.DataFrame()
-
-    df = read_func(file, skiprows=13, index_col=False)
-    trj1_file = TRJ1(file.name, df)
-    trj1_file.clean_dataframe()
-    trj1_list.append(trj1_file)
-    return df
-
-def read_default_files() -> pd.DataFrame:
-    for file in os.listdir("./data"):
-        df = pd.read_excel("./data/" + file,
-                                skiprows=13,
-                                index_col=False)  # use default data
-        trj1_file = TRJ1(file, df)
-        trj1_file.clean_dataframe()
-        trj1_list.append(trj1_file)
-    return df
-
-def update_metric_choice(trj1_list: List[TRJ1], metric_choice: str) -> List[TRJ1]:
-    metric_type = "Unique_Item_Requests" if metric_choice == "Unique Item Requests" else "Total_Item_Requests"
-    for trj1 in trj1_list:
-        trj1.dataframe = trj1.dataframe[trj1.dataframe["Metric_Type"] == metric_type].drop(columns=["Metric_Type"])
-        trj1.set_reporting_period_total()
-    return trj1_list
-
-
-def sort_trj1_list(unsorted_trj1_list: List[TRJ1]) -> List[TRJ1]:
-    return sorted(unsorted_trj1_list, key=lambda x: x.start_date)
-
 # display sidebar
 with st.sidebar:
     st.subheader(
@@ -74,12 +32,12 @@ with st.sidebar:
         accept_multiple_files=True,
     ):
         for file in file_upload:
-            df = read_file(file)
+            df = read_file(file, trj1_list)
         # displays files uploaded successfully using inflect module
         st.success(p.no("file", len(file_upload)) +
                             " uploaded successfully!", icon="✅")
     else:
-        df = read_default_files()
+        df = read_default_files(trj1_list)
 
 trj1_count = len(trj1_list)
 trj1_list = sort_trj1_list(trj1_list)
