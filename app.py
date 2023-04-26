@@ -24,21 +24,25 @@ trj1_count = 0
 st.set_page_config(page_icon=None, page_title="Counter Visualization")
 
 # Function to read file based on type
+@st.cache_data
 def read_file(file: UploadedFile) -> pd.DataFrame:
+    read_func = None
     if file.type == "text/csv":  # csv file
-        df = pd.read_csv(file, skiprows=13, index_col=False)
+        read_func = pd.read_csv
     elif file.type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":  # xslx file
-        df = pd.read_excel(file, skiprows=13)
+        read_func = pd.read_excel
     elif file.type == "text/tab-separated-values":  # tsv file
-        df = pd.read_csv(file, sep='\t', skiprows=13)
-    else:
-        st.warning('Warning: Please upload a file of the correct type as listed above.',
-                    icon="⚠️")
+        read_func = lambda f, **kwargs: pd.read_csv(f, sep='\t', **kwargs)
+    
+    if not read_func:
+        st.warning('Warning: Please upload a file of the correct type as listed above.', icon="⚠️")
+        return pd.DataFrame()
+
+    df = read_func(file, skiprows=13, index_col=False)
     trj1_file = TRJ1(file.name, df)
     trj1_file.clean_dataframe()
     trj1_list.append(trj1_file)
     return df
-
 
 def read_default_files() -> pd.DataFrame:
     for file in os.listdir("./data"):
@@ -49,7 +53,6 @@ def read_default_files() -> pd.DataFrame:
         trj1_file.clean_dataframe()
         trj1_list.append(trj1_file)
     return df
-
 
 def update_metric_choice(trj1_list: List[TRJ1], metric_choice: str):
     metric_trj1_list = trj1_list
@@ -71,12 +74,11 @@ def sort_trj1_list(unsorted_trj1_list: List[TRJ1]) -> List[TRJ1]:
 with st.sidebar:
     st.subheader(
         "The sidebar is resizable! Drag and drop the right border of the sidebar to resize it! ↔️")
-    # Upload file - of type csv, tsv, or xlsx (read excel can also accept xls, xlsx, xlsm, xlsb, odf, ods and odt)
-    file_upload = st.file_uploader("Drag & drop or browse files to upload one unmodified TR-J1 spreadsheet per fiscal year:",
-                                        type=['csv', 'tsv', 'xlsx'],
-                                        accept_multiple_files=True)
-    # Decision Tree to upload the files
-    if file_upload:
+    if file_upload := st.file_uploader(
+        "Drag & drop or browse files to upload one unmodified TR-J1 spreadsheet per fiscal year:",
+        type=['csv', 'tsv', 'xlsx'],
+        accept_multiple_files=True,
+    ):
         for file in file_upload:
             df = read_file(file)
         # displays files uploaded successfully using inflect module
@@ -119,10 +121,8 @@ df_dates = {trj1.name: trj1.get_header_dates() for trj1 in trj1_list}
 all_dates = []
 dates_set = set()
 
-for trj1_file in trj1_list:
-    all_dates.extend(trj1_file.get_header_dates())
-    file_date_set = set(trj1_file.get_header_dates())
-    dates_set = dates_set.union(file_date_set)
+all_dates = [date for trj1_file in trj1_list for date in trj1_file.get_header_dates()]
+dates_set = set(all_dates)
 
 if len(dates_set) != len(all_dates):
     st.warning('Warning: Two or more of your files contain data for the same month. \
@@ -136,25 +136,23 @@ st.write("#")  # simple spacer
 st.subheader("You have successfully uploaded " + p.no("file",
                 trj1_count) + " with the following details: ")
 
-# Identify Unique Journals per TRJ1 file by counting len of unique item requests
-unique_journals = []
-for trj1 in trj1_list:
-    unique_journals.append(
-        len(trj1.dataframe.loc[trj1.dataframe['Metric_Type']
-            == 'Unique_Item_Requests'])
+unique_journals = [
+    len(
+        trj1.dataframe.loc[
+            trj1.dataframe['Metric_Type'] == 'Unique_Item_Requests'
+        ]
     )
-
-# listing dates based off either it is date time class or string
-date_col = []
-for date_range in df_dates.values():
-    date_col.append(date_range[0].strftime(
-        "%m/%Y") + " - " + date_range[-1].strftime("%m/%Y"))
-
+    for trj1 in trj1_list
+]
+date_col = [
+    date_range[0].strftime("%m/%Y") + " - " + date_range[-1].strftime("%m/%Y")
+    for date_range in df_dates.values()
+]
 # saving file data into one hashmap
 file_details = {
-    "File Name": [file for file in df_dates],
-    "Date Range": [date for date in date_col],
-    "Number of Journals": [num for num in unique_journals]
+    "File Name": list(df_dates),
+    "Date Range": list(date_col),
+    "Number of Journals": list(unique_journals),
 }
 
 # creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
@@ -207,36 +205,48 @@ for i, trj1 in enumerate(trj1_list):
 
 ############### Streamlit: Displaying Data #################
 # using counter to get occurences of each num
-occurrences_list = []
 titles_set = set()
 max_df_values = []
 
+title_header = "Journals with this many item requests(double-click to see full list)"
 # loop through each dataframe in the list to create new dataframe
-for trj1 in trj1_list:
-    df = trj1.dataframe
-    occurrences = collections.Counter(df["Reporting_Period_Total"])
-    titles = defaultdict(list)
-    # There must be at least one journal linked to rpt, thus we can use a defaultdict and assure that there are no empty lists
-    for index, row in df.iterrows():
-        titles[row["Reporting_Period_Total"]].append(row['Title'])
-        titles_set.add(row['Title'])
+metric_choice = "Reporting_Period_Total"
+count_header = "Number of journals with this many item requests"
+title_header = "Titles of journals with this many item requests"
 
-    # create a dictionary that would contain the count numbers, the reporting total, and the titles of the journals
-    count_header = "Number of journals with this many item requests"
-    title_header = "Journals with this many item requests(double-click to see full list)"
+# Define a defaultdict to store the titles of the journals
+titles = defaultdict(list)
+titles_set = set()
+
+# Iterate through the list of trj1 objects
+occurrences_list = []
+
+dfs = [trj1.dataframe for trj1 in trj1_list]
+
+for df in dfs:
+    # Count the number of occurrences of each value in the metric_choice column
+    occurrences = df[metric_choice].value_counts().sort_index()
+    # Group the data by the values in the metric_choice column
+    grouped_data = df.groupby(metric_choice)
+    # Apply a lambda function to each group to create a list of titles
+    titles_list = grouped_data.apply(lambda x: x['Title'].tolist())
+    # Create a DataFrame from the extracted data
     data = {
-        metric_choice: [key for key, _ in occurrences.items()],
-        count_header: [val for _, val in occurrences.items()],
-        title_header: [val for _, val in titles.items()]
+        metric_choice: occurrences.index.tolist(),
+        count_header: occurrences.tolist(),
+        title_header: titles_list.tolist(),
     }
     usage_df = pd.DataFrame(data)
-    # max_df_values.append(usage_df[metric_choice].max())
     occurrences_list.append(usage_df)
+
 # Create Line plot of Distribution of Cost Per Use
 st.header("Distribution of Cost Per Use")
-fig1 = linePlot(date_col, cpuDF)[0]
-fig1.update_layout(yaxis=dict(range=[0, max(linePlot(date_col, cpuDF)[1]["Cost Per Use"])+1]))
-st.plotly_chart(fig1)
+if 0 not in cpuDF:
+    fig1 = linePlot(date_col, cpuDF)[0]
+    fig1.update_layout(yaxis=dict(range=[0, max(linePlot(date_col, cpuDF)[1]["Cost Per Use"])+1]))
+    st.plotly_chart(fig1)
+else:
+    st.write("Please provide input for Cost Per Use")
 
 
 # Usage Distribution - Tabs
@@ -248,56 +258,35 @@ st.write("See which journals were used the most and least for each \
 hist_tab = st.tabs(date_col)
 for i, trj1 in enumerate(trj1_list):
     with hist_tab[i]:
-        # create a dataframe from the dictionary created earlier so it could be later be dsiplayed or performed with other python functions
-        # determine the maximum numbers to better scale the x-axis(max_report) and y-axis(max_count)
-        usage_df = occurrences_list[i]
-        usage_df = usage_df.rename_axis("Row Index")
+        # get the dataframe from the list created earlier so it can be displayed or used with other Python functions
+        usage_df = occurrences_list[i].rename_axis("Row Index")
         max_count = usage_df[count_header].max()
         max_report = int(usage_df[metric_choice].max())
-        chartHeight = 0
-        stacked_df = trj1.dataframe
 
-        # create a filter silder and use user input to create a filtered dataframe
-        filter_slider = st.slider("Set the minimum and maximum reporting period total (x-axis) here.",
-                                    1, max_report,
-                                    value=(1, max_report))  # slider for user to check a varying range of reporting period totals
-        filter_min = filter_slider[0]
-        filter_max = filter_slider[1]
-        filter_diff = filter_max - filter_min
-        filter = stacked_df["Reporting_Period_Total"].between(
-            filter_min, filter_max, "both")  # returns whether element in Series is between
-        # creates a filtered dataframe by only including elements that are true from filter variable
-        filtered_df = stacked_df[filter]
+        # create a filter slider and use user input to create a filtered dataframe
+        filter_slider = st.slider("Set the minimum and maximum reporting period total (x-axis) here.", 1, max_report, value=(1, max_report))
+        filtered_df = trj1.dataframe.query('Reporting_Period_Total >= @filter_slider[0] and Reporting_Period_Total <= @filter_slider[1]')
+
+        # display number of filtered journals
         filter_count = len(filtered_df)
+        plural_journals = p.plural("journal", filter_count)
+        filter_range = f"{filter_slider[0]} - {filter_slider[1]}" if filter_slider[0] != filter_slider[1] else f"{filter_slider[0]}"
+        st.write(f"There {'is' if filter_count == 1 else 'are'} currently {p.no(plural_journals, filter_count)} within the following range: {filter_range} reporting period total")
 
-        # grammar based on filter slider using inflect
-        if filter_diff:
-            st.write("There " + p.plural("is", filter_count) + " currently " + p.no("journal", filter_count) +
-                    " within the following range: {} - {} reporting period total".format(filter_min, filter_max))
-        else:
-            st.write("There " + p.plural("is", filter_count) + " currently " + p.no(
-                "journal", filter_count) + " with {} reporting period total".format(filter_min))
+        # determine the height for the histogram based on the maximum count
+        chart_height = 600 if 300 <= max_count <= 600 else max_count if max_count < 300 else 500
 
-        # condition to determine the height for the histogram
-        if max_count >= 300:
-            if max_count >= 300 & max_count <= 600:
-                chartHeight = 600
-            else:
-                chartHeight = max_count
-        else:
-            chartHeight = 500
-
-        # creates a collapsible view of the dataframe containing in details the reporting total, the titles, and the counts of journals
+        # create a collapsible view of the filtered dataframe
         with st.expander("Expand to see the filtered data behind the distribution:", expanded=False):
-            st.write("#")  # spacing between text
-            st.caption(
-                "Click on column header to sort by ascending/descending order")
+            st.write("#")
+            st.caption("Click on column header to sort by ascending/descending order")
             st.dataframe(filtered_df, use_container_width=True)
 
-        stacked_hist = histogram(filtered_df, filter_max, chartHeight)
-        st.write("#")  # simple spacer
+        # display the histogram
+        stacked_hist = histogram(filtered_df, filter_slider[1], chart_height)
+        st.write("#")
         st.altair_chart(stacked_hist, use_container_width=True)
-
+        
 st.write("Click on plot and scroll to zoom, click & drag to move, \
             and double-click to reset view. Click ... at top right \
             to download the chart as an SVG/PNG.")
@@ -315,27 +304,17 @@ bar_df.extend(titles_selected)
 
 # determine whether the user has selected any journal
 if not titles_selected:
-    st.warning(
-        "To view journals over time, please select journals above.")
+    st.warning("To view journals over time, please select journals above.")
 else:
-    # add a column of Fiscal Year to the dataframe corresponding to their fiscal year
-    for i in range(len(trj1_list)):
-        df = trj1_list[i].dataframe
-        df = df.iloc[:, [0, 1]]
-        df["Fiscal Year"] = date_col[i]
-        trj1_list[i].dataframe = df
-
-    # create a new dataframe that bind all of the dataframes together
-    concat_df = pd.concat([df.dataframe for df in trj1_list])
-    df = ""
-    if bar_df != "":
-        # create a dataframe that will only contain the titles of the journals that the user selected
+    # create a new dataframe that combines all dataframes together and add a column of Fiscal Year to the dataframe corresponding to their fiscal year
+    concat_df = pd.concat([df.dataframe.assign(Fiscal_Year=date_col[i]) for i, df in enumerate(trj1_list)], ignore_index=True)
+    #st.dataframe(concat_df)
+    if bar_df:
+        # filter the dataframe by the selected titles
         df = concat_df[concat_df["Title"].isin(bar_df)]
-    st.dataframe(df, use_container_width=True)
-
-    # convert the fiscal year column into a categorical variable
-    df['Fiscal Year'] = df['Fiscal Year'].astype('category')
-    #create a Plotly barchart
-    fig = barChart(df)
-    st.plotly_chart(fig)
-    st.write("Please keep in mind that perhaps not all journals may be present in every file, therefore certain journals may not have a full collection of bars in the graph above.")
+        # convert the fiscal year column into a categorical variable and create a Plotly bar chart
+        df['Fiscal_Year'] = pd.Categorical(df['Fiscal_Year'])
+        fig = barChart(df)
+        st.plotly_chart(fig)
+    else:
+        st.warning("Please select at least one title to view journals over time.")
