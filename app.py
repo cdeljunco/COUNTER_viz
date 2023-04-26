@@ -43,7 +43,6 @@ def read_file(file: UploadedFile) -> pd.DataFrame:
     trj1_list.append(trj1_file)
     return df
 
-@st.cache_data
 def read_default_files() -> pd.DataFrame:
     for file in os.listdir("./data"):
         df = pd.read_excel("./data/" + file,
