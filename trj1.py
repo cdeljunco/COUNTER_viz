@@ -1,6 +1,7 @@
 import pandas as pd
 from datetime import datetime
 import numpy as np
+import streamlit as st
 from typing import List
 
 class TRJ1:
@@ -51,8 +52,7 @@ class TRJ1:
                     list_data += " " + new_datetime.strftime("%m/%Y")
                 except ValueError:
                     list_data += " " + data
-        str_data = self.name + list_data
-        return str_data
+        return self.name + list_data
     
     # Sets start date by iterating through headers and finding first datetime value
     def set_start_date(self) -> None:
@@ -78,10 +78,7 @@ class TRJ1:
     # Determines whether file is a full Fiscal Year by subtracting start and end date
     def is_Full_FY(self) -> bool:
         diff = self.end_date - self.start_date # -> timedelta type
-        if diff.days >= 335:
-            return True
-        else:
-            return False
+        return diff.days >= 335
     
     # Removes all unwanted columns that will not be used at all
     def clean_dataframe(self) -> None:

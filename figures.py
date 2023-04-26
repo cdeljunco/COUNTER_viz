@@ -41,7 +41,6 @@ def histogram(dataframe,filter_max,chartHeight):
 
 
 # Create a bar chart with color corresponding to the fiscal years
-@st.cache_data
 def barChart(dataframe):
     return px.bar(
         dataframe,
