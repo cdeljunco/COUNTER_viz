@@ -7,9 +7,11 @@ import inflect
 from typing import List
 from figures import *
 from helper_fxns import *
+from projections import *
 
 # intitializes inflect class for grammar
 p = inflect.engine()
+
 # Empty Panda Dataframe that stores a read TRJ1 File
 df = pd.DataFrame()
 
@@ -90,8 +92,10 @@ st.subheader("You have successfully uploaded " + p.no("file",
 
 # extract unique item requests for each TRJ1 object in trj1_list
 unique_journals = [trj1.dataframe['Metric_Type'].eq('Unique_Item_Requests').sum() for trj1 in trj1_list]
+
 # create date column for display
 date_col = [f"{date_range[0].strftime('%m/%Y')} - {date_range[-1].strftime('%m/%Y')}" for date_range in df_dates.values()]
+
 # saving file data into one hashmap
 file_details = {
     "File Name": list(df_dates),
@@ -141,7 +145,7 @@ st.sidebar.header("Cost Per Use")
 st.sidebar.write(
     'Input the journal package cost in dollars for the period covered by each TR_J1 file:')
 cpuDF = []
-# cpuName = []
+
 for i, trj1 in enumerate(trj1_list):
     cost = st.sidebar.number_input(
         ' ' + date_col[i] + ' ', min_value=0.00, format="%f", key=trj1.name)
@@ -273,3 +277,10 @@ else:
         st.plotly_chart(fig)
     else:
         st.warning("Please select at least one title to view journals over time.")
+
+complete_trj1_list, incomplete_trj1 = set_complete_incomplete_files(trj1_list)
+projection = project_total_uses(complete_trj1_list, incomplete_trj1)
+st.write(projection)
+# st.write([trj1.rpt for trj1 in trj1_list])
+remaining_months = calculate_remaining_months(incomplete_trj1)
+# st.write(remaining_months)
