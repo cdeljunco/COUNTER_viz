@@ -21,7 +21,11 @@ class TRJ1:
     rpt: float, default None
             sum of reporting period total column
     cpu: float, default None
-            cost per use 
+            cost per use, used for TRJ1's that are a complete FY
+    projected_usage: int, default None
+            projected usage calculated in helper_fxns.py and stored in var if current TRJ1 is not complete FY
+    projected_cpu: float, default None
+            projected cost per use given projected usage and cost, only used for incomplete FY TRj1's
     """
 
     def __init__(
@@ -31,7 +35,9 @@ class TRJ1:
         start_date: datetime = None, 
         end_date: datetime = None,
         rpt: float = None, # reporting period total sum
-        cpu: float = None  # cost per use
+        cpu: float = None,  # cost per use
+        projected_usage: int = None, # projected usage to set cost per use
+        projected_cpu: float = None # projected cost per use, set for not full fiscal years
     ) -> None:
         
         self.name = name
@@ -40,6 +46,8 @@ class TRJ1:
         self.end_date = end_date
         self.rpt = rpt # sum of unique or total item req
         self.cpu = cpu # cost per use
+        self.projected_usage = projected_usage # projected usage to set cost per use
+        self.projected_cpu = projected_cpu # projected cost per use, only set if not full fiscal year
 
     def __str__(self) -> str:
         list_data = ""
@@ -74,6 +82,12 @@ class TRJ1:
     # Sets cost per use given cost as a parameter
     def set_cost_per_use(self, cost) -> None:
         self.cpu = float(cost / self.rpt)
+
+    def set_projected_usage(self, projection) -> None:
+        self.projected_usage = projection
+
+    def set_projected_cost_per_use(self, cost) -> None:
+        self.projected_cpu = float(cost / self.projected_usage)
 
     # Determines whether file is a full Fiscal Year by subtracting start and end date
     def is_Full_FY(self) -> bool:
