@@ -122,6 +122,14 @@ else:
 # only include rows for specified metric choice
 trj1_list = update_metric_choice(trj1_list, metric_choice)
 
+# Filter incomplete/complete TRJ1's
+complete_trj1_list, incomplete_trj1 = set_complete_incomplete_files(trj1_list)
+
+# Create projections for each incomplete TRJ1 
+for incomplete in incomplete_trj1:
+    projection = project_total_uses(complete_trj1_list, incomplete)
+    incomplete.set_projected_usage(projection)
+
 # sidebar (Cost Per Use: Input and Output)
 st.sidebar.write("#")  # simple spacer
 st.sidebar.header("Cost Per Use")
@@ -132,12 +140,20 @@ cpuDF = []
 for i, trj1 in enumerate(trj1_list):
     cost = st.sidebar.number_input(
         ' ' + date_col[i] + ' ', min_value=0.00, format="%f", key=trj1.name)
-    if cost != 0:
+    if cost != 0 and trj1.is_Full_FY():
         trj1.set_cost_per_use(cost) 
+    elif cost != 0 and not trj1.is_Full_FY():
+        trj1.set_projected_cost_per_use(cost)
     else: 
         trj1.cpu = 0
-    st.sidebar.write("The Cost Per Use is : $ " + format(trj1.cpu, ".2f"))
+        trj1.projected_cpu = 0
+
+    st.sidebar.write("The Cost Per Use is : $ " + format(trj1.cpu if trj1.is_Full_FY() else trj1.projected_cpu, ".2f") + ("*" if not trj1.is_Full_FY() else ""))
     cpuDF.append(trj1.cpu)
+if incomplete_trj1:
+    st.sidebar.write("*Data provided for this year is incomplete. \
+                            This is the projected CPU for the entire fiscal year \
+                            based on patterns of use in the other years of data provided.")
 
 ############### Streamlit: Displaying Data #################
 # using counter to get occurences of each num
@@ -275,10 +291,7 @@ else:
     else:
         st.warning("Please select at least one title to view journals over time.")
 
-complete_trj1_list, incomplete_trj1 = set_complete_incomplete_files(trj1_list)
-for incomplete in incomplete_trj1:
-    projection = project_total_uses(complete_trj1_list, incomplete)
-    st.write(projection)
+
 # st.write([trj1.rpt for trj1 in trj1_list])
 # remaining_months = calculate_remaining_months(incomplete_trj1)
 # st.write(remaining_months)
