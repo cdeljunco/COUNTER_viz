@@ -44,9 +44,6 @@ with st.sidebar:
 trj1_count = len(trj1_list)
 trj1_list = sort_trj1_list(trj1_list)
 
-# Main image and header -- image will be removed
-# image = Image.open('header.jfif')
-# st.image(image)
 st.markdown("#### This app analyzes and plots TR_J1 journal usage data to allow you \
             to easily assess the usage distribution, cost per use, and usage trends \
             over time for your library's journal package subscriptions.")

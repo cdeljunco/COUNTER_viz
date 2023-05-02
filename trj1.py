@@ -94,7 +94,7 @@ class TRJ1:
         diff = self.end_date - self.start_date # -> timedelta type
         return diff.days >= 335
     
-    # Removes all unwanted columns that will not be used at all
+    # Removes columns that will not be used 
     def clean_dataframe(self) -> None:
         self.set_start_date()
         self.set_end_date()
