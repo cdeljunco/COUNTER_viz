@@ -18,7 +18,21 @@ COUNTER_viz is a data visualization tool that enables libraries to upload TRJ1 f
 ### File requirements
 
 1. Your TRJ1 file must be of type csv, tsv, or xlsx.
+
 2. It must remain unchanged after downloading it from your directory.
+3. Ensure the following columns exist in your files:
+    * Title
+    * Publisher
+    * Publisher_ID
+    * Platform
+    * DOI
+    * Proprietary_ID
+    * Print_ISSN
+    * Online_ISSN
+    * Sn
+    * URI
+    * Metric_Type
+    * Reporting_Period_Total
 
 # Run Streamlit App
 
