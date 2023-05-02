@@ -34,6 +34,10 @@ COUNTER_viz is a data visualization tool that enables libraries to upload TRJ1 f
     * Metric_Type
     * Reporting_Period_Total
 
+## Projected Cost Per Use Feature
+
+A predicted cost per usage will be determined based on the inputted cost for that year if one of the supplied TRJ1 files has less than 12 months of data. The projected cost per use is estimated using the cost per use from the prior fiscal years, provided that they all have 12 months of data.
+
 # Run Streamlit App
 
 1. Clone the streamlit app to a directory of choice
