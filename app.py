@@ -1,10 +1,7 @@
 import pandas as pd
 import streamlit as st
-import collections
 from collections import defaultdict
-import os
 import inflect
-from typing import List
 from figures import *
 from helper_fxns import *
 from projections import *
@@ -62,7 +59,6 @@ check_duplicate_dates(trj1_list)
 # key = name of file, val = list of dates
 df_dates = {trj1.name: trj1.get_header_dates() for trj1 in trj1_list}
 
-
 st.write("#")  # simple spacer
 st.write("#")  # simple spacer
 
@@ -101,11 +97,8 @@ with st.expander("Expand to see raw TR_J1 data:"):
             with tabs[i]:
                 st.dataframe(trj1.dataframe)
 
-
-############### Streamlit radio for Metric Type ##############
 st.write("#")  # simple spacer
-#st.markdown("Learn more about <a href='https://www.projectcounter.org/about/'>COUNTER</a>.", unsafe_allow_html=True)
-# https://medialibrary.projectcounter.org/file/The-Friendly-Guide-for-Librarians
+
 # Decision Tree to verify that both metric types exist in trj1 files
 if 'Unique_Item_Requests' in df['Metric_Type'].values and "Total_Item_Requests" in df['Metric_Type'].values:
     metric_choice = st.radio(
@@ -130,9 +123,8 @@ for incomplete in incomplete_trj1:
 # sidebar (Cost Per Use: Input and Output)
 st.sidebar.write("#")  # simple spacer
 st.sidebar.header("Cost Per Use")
-st.sidebar.write(
-    'Input the journal package cost in dollars for the period covered by each TR_J1 file:')
-cpuDF = []
+st.sidebar.write('Input the journal package cost in dollars for the period covered by each TR_J1 file:')
+cpu_list = []
 
 for i, trj1 in enumerate(trj1_list):
     cost = st.sidebar.number_input(
@@ -146,7 +138,7 @@ for i, trj1 in enumerate(trj1_list):
         trj1.projected_cpu = 0
 
     st.sidebar.write("The Cost Per Use is : $ " + format(trj1.cpu if trj1.is_Full_FY() else trj1.projected_cpu, ".2f") + ("*" if not trj1.is_Full_FY() else ""))
-    cpuDF.append(trj1.cpu)
+    cpu_list.append(trj1.cpu)
 if incomplete_trj1:
     st.sidebar.write("*Data provided for this year is incomplete. \
                             This is the projected CPU for the entire fiscal year \
@@ -196,9 +188,9 @@ for df in dfs:
 
 # Create Line plot of Distribution of Cost Per Use
 st.header("Distribution of Cost Per Use")
-if date_col and 0 not in cpuDF:
-    fig1 = linePlot(date_col, cpuDF)[0]
-    fig1.update_layout(yaxis=dict(range=[0, max(linePlot(date_col, cpuDF)[1]["Cost Per Use"])+1]))
+if date_col and 0 not in cpu_list:
+    fig1 = linePlot(date_col, cpu_list)[0]
+    fig1.update_layout(yaxis=dict(range=[0, max(linePlot(date_col, cpu_list)[1]["Cost Per Use"])+1]))
     st.plotly_chart(fig1)
 else:
     st.warning("Please provide input for Cost Per Use in the sidebar")
@@ -209,14 +201,13 @@ st.write("#")  # simple spacer
 st.header("Usage Distribution")
 st.write("See which journals were used the most and least for each \
             of the time periods covered by your TR_J1 reports")
-#st.caption("Click on each tab to view the specific Fiscal Year")
+
 if not date_col:
     st.write("Please provide a data input")
 else:
     hist_tab = st.tabs(date_col)
     # precompute max_report across all dataframes
     max_reports = [int(occurrences[metric_choice].max()) for occurrences in occurrences_list]
-    # precompute the plural version of 'journal' for efficiency
     for i, trj1 in enumerate(trj1_list):
         with hist_tab[i]:
             # get the dataframe from the list created earlier so it can be displayed
