@@ -129,16 +129,19 @@ cpu_list = []
 for i, trj1 in enumerate(trj1_list):
     cost = st.sidebar.number_input(
         ' ' + date_col[i] + ' ', min_value=0.00, format="%f", key=trj1.name)
+    print(cpu_list)
     if cost != 0 and trj1.is_Full_FY():
         trj1.set_cost_per_use(cost) 
+        cpu_list.append(trj1.cpu)
     elif cost != 0 and not trj1.is_Full_FY():
         trj1.set_projected_cost_per_use(cost)
+        cpu_list.append(trj1.projected_cpu)
     else: 
         trj1.cpu = 0
         trj1.projected_cpu = 0
+        cpu_list = [0 for _ in trj1_list]
 
     st.sidebar.write("The Cost Per Use is : $ " + format(trj1.cpu if trj1.is_Full_FY() else trj1.projected_cpu, ".2f") + ("*" if not trj1.is_Full_FY() else ""))
-    cpu_list.append(trj1.cpu)
 if incomplete_trj1:
     st.sidebar.write("*Data provided for this year is incomplete. \
                             This is the projected CPU for the entire fiscal year \
