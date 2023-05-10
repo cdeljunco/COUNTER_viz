@@ -4,7 +4,7 @@
 
 COUNTER_viz is a data visualization tool that enables libraries to upload TR_J1 COUNTER reports and visualize the usage distribution of journals inha given year; compare usage of individual journals year-over-year; calculate the cost per use of journal packages; and estimate the cost-per-use for incomplete years of data. 
 
-The application si written in Python and uses [Altair](https://altair-viz.github.io/index.html) to develop interactive graphs and [Streamlit](https://streamlit.io/) to deploy as a website.
+The application is written in Python and uses [Altair](https://altair-viz.github.io/index.html) to develop interactive graphs and [Streamlit](https://streamlit.io/) to deploy as a website.
 
 The app can be used [online](http://userphp.wesleyan.edu:8501/) when connected to the Wesleyan WiFi network or VPN, or run locally using the instructions below.
 
