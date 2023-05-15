@@ -129,7 +129,6 @@ cpu_list = []
 for i, trj1 in enumerate(trj1_list):
     cost = st.sidebar.number_input(
         ' ' + date_col[i] + ' ', min_value=0.00, format="%f", key=trj1.name)
-    print(cpu_list)
     if cost != 0 and trj1.is_Full_FY():
         trj1.set_cost_per_use(cost) 
         cpu_list.append(trj1.cpu)
@@ -165,9 +164,9 @@ titles_set = set()
 # Iterate through the list of trj1 objects
 occurrences_list = []
 
-dfs = [trj1.dataframe for trj1 in trj1_list]
+for trj1 in trj1_list:
 
-for df in dfs:
+    df = trj1.dataframe
     # Count the number of occurrences of each value in the metric_choice column
     occurrences = df[metric_choice].value_counts().sort_index()
 
@@ -271,7 +270,6 @@ if not titles_selected:
 else:
     # create a new dataframe that combines all dataframes together and add a column of Fiscal Year to the dataframe corresponding to their fiscal year
     concat_df = pd.concat([df.dataframe.assign(Fiscal_Year=date_col[i]) for i, df in enumerate(trj1_list)], ignore_index=True)
-    #st.dataframe(concat_df)
     if bar_df:
         # filter the dataframe by the selected titles
         df = concat_df[concat_df["Title"].isin(bar_df)]
