@@ -6,8 +6,6 @@ COUNTER_viz is a data visualization tool that enables libraries to upload TR_J1 
 
 The application is written in Python and uses [Altair](https://altair-viz.github.io/index.html) to develop interactive graphs and [Streamlit](https://streamlit.io/) to deploy as a website.
 
-The app can be used [online](http://userphp.wesleyan.edu:8501/) when connected to the Wesleyan WiFi network or VPN, or run locally using the instructions below.
-
 ## Running the app locally
 
 <u>Prerequisites</u>
