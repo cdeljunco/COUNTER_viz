@@ -13,7 +13,7 @@ The app can be used [online](http://userphp.wesleyan.edu:8501/) when connected t
 <u>Prerequisites</u>
 
 1. Any version of [Python 3.7-3.10](https://www.python.org/downloads/) (Streamlit does not currently support Python 3.11) *except* 3.9.7
-2. Python packages: streamlit \geq v1.15.1, altair, plotly, datetime, pandas, typing, numpy, os
+2. Python packages: streamlit \geq v1.15.1, altair, plotly, datetime, pandas, typing, numpy, os, inflect, openpyxl
 
 <u>How to run locally</u>
 
